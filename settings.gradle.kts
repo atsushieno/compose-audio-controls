@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ComposeAudioControls"
 include(":app")
- 
+include(":compose-audio-controls")

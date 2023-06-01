@@ -1,4 +1,4 @@
-package org.androidaudioplugin.composeaudiocontrols.ui.theme
+package org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    namespace = "org.androidaudioplugin.composeaudiocontrols"
+    namespace = "org.androidaudioplugin.composeaudiocontrols.demoapp"
     compileSdk = 33
 
     defaultConfig {
         applicationId = "org.androidaudioplugin.composeaudiocontrols"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":compose-audio-controls"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)

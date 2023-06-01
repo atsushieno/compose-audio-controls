@@ -1,4 +1,4 @@
-package org.androidaudioplugin.composeaudiocontrols
+package org.androidaudioplugin.composeaudiocontrols.demoapp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,7 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.androidaudioplugin.composeaudiocontrols.ui.theme.ComposeAudioControlsTheme
+import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
+import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudioControlsTheme
+
+internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toBigDecimal().toPlainString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

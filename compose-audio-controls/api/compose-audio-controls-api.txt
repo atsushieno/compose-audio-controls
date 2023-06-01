@@ -1,0 +1,27 @@
+package org.androidaudioplugin.composeaudiocontrols {
+
+  public final class ImageStripKnobKt {
+    method @androidx.compose.runtime.Composable public static void DefaultKnobTooltip(optional @NonNull androidx.compose.ui.Modifier modifier, boolean showTooltip, float value, optional long textColor);
+    method @androidx.compose.runtime.Composable public static void ImageStripKnob(optional @NonNull androidx.compose.ui.Modifier modifier, @NonNull androidx.compose.ui.graphics.ImageBitmap imageBitmap, optional float value, optional float minValue, optional float maxValue, optional float minSizeInDp, optional long tooltipColor, optional @NonNull kotlin.jvm.functions.Function1<? super org.androidaudioplugin.composeaudiocontrols.ImageStripKnobScope,kotlin.Unit> tooltip, optional @NonNull kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> valueChanged);
+  }
+
+  @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public interface ImageStripKnobScope {
+    method public boolean getKnobIsBeingDragged();
+    method public float getKnobValue();
+    property public abstract boolean knobIsBeingDragged;
+    property public abstract float knobValue;
+  }
+
+  public final class ImageStripKnob_androidKt {
+    method @androidx.compose.runtime.Composable public static void ImageStripKnob(optional @NonNull androidx.compose.ui.Modifier modifier, @DrawableRes int drawableResId, optional float value, optional float minValue, optional float maxValue, optional float minSizeInDp, optional long tooltipColor, optional @NonNull kotlin.jvm.functions.Function1<? super org.androidaudioplugin.composeaudiocontrols.ImageStripKnobScope,kotlin.Unit> tooltip, optional @NonNull kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> valueChanged);
+  }
+
+  public final class ScalingPainter extends androidx.compose.ui.graphics.painter.Painter {
+    ctor public ScalingPainter(@NonNull androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional float scale);
+    method public long getIntrinsicSize();
+    method protected void onDraw(@NonNull androidx.compose.ui.graphics.drawscope.DrawScope);
+    property public long intrinsicSize;
+  }
+
+}
+

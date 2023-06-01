@@ -13,9 +13,8 @@
         android:theme="@style/Theme.ComposeAudioControls"
         tools:targetApi="31">
         <activity
-            android:name="org.androidaudioplugin.composeaudiocontrols.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.ComposeAudioControls">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
