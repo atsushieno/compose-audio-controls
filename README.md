@@ -11,7 +11,7 @@ for audio apps. Well, actually currently we only have a Knob control implementat
 
 ### KnobMan image strip
 
-It makes use of [KnobMan](https://www.kvraudio.com/product/knobman-by-g200kg) image resource. If you are curious what this means, go to [Knob Gallery](https://www.g200kg.com/en/webknobman/gallery.php). You can use these knobs without coding anything. It is a cheap trick, but offers what people really need. It is used by wide range of people in audio app industry (such as [Kontakt](https://www.native-instruments.com/en/products/komplete/samplers/kontakt-7/) instrument, Web audio/music app developers who use [webaudio-controls](http://g200kg.github.io/webaudio-controls/docs/)) use it. It gives you a lot of choices:
+It makes use of [KnobMan](https://www.kvraudio.com/product/knobman-by-g200kg) image resource. If you are curious what this means, go to [Knob Gallery](https://www.g200kg.com/en/webknobman/gallery.php). You can use these knobs without coding anything. It is a cheap trick, but offers what people really need. It is used by wide range of people in audio app industry (such as [Kontakt](https://www.native-instruments.com/en/products/komplete/samplers/kontakt-7/) instrument, Web audio/music app developers who use [webaudio-controls](http://g200kg.github.io/webaudio-controls/docs/)). It gives you a lot of choices:
 
 ![KnobGallery sshot](docs/images/KnobGallery-sshot.png)
 
