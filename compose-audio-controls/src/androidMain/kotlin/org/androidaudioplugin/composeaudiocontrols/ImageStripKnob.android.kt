@@ -10,30 +10,30 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
+import java.time.temporal.ValueRange
 
 
 /**
  * Implements a knob control that is based on KnobMan image strip. See another ImageStripKnob() for more details.
  *
  * This Android-only function overload takes a drawable resource ID (`drawableResId`) to ease image loading.
+ * (Since we use our own `ScalingPainter`, we cannot simply use `painterResource()` to this function.)
  *
  * @param modifier          A `Modifier` to be applied to this knob control.
  * @param drawableResId     The Android Resource Id for this knob.
  * @param value             The value that this knob should render for. It should be within the range between `minValue` and `maxValue`.
- * @param minValue          The minimum value, which defines the value range, along with `maxValue`. It defaults to `0f`
- * @param maxValue          The maximum value, which defines the value range, along with `minValue`. It defaults to `1f`
+ * @param valueRange        The value range. It defaults to `0f..1f`.
  * @param explicitSizeInDp  An optional size in Dp if you want an explicit rendered widget size instead of the sizes in image, in `Dp`.
  * @param minSizeInDp       The minimum rendered widget size in `Dp`. It defaults to `48.dp` which is the minimum recommended widget size by Android Accessibility Help.
  * @param tooltipColor      The color of the default implementation of the value label tooltip.
  * @param tooltip           The tooltip Composable which may be rendered in response to user's drag action over this knob.
- * @param valueChanged      An event handler function that takes the changed value. See the documentation for `ImageStripKnob` function for details.
+ * @param onValueChange     An event handler function that takes the changed value. See the documentation for `ImageStripKnob` function for details.
  */
 @Composable
 fun ImageStripKnob(modifier: Modifier = Modifier,
                    @DrawableRes drawableResId: Int,
                    value: Float = 0f,
-                   minValue: Float = 0f,
-                   maxValue: Float = 1f, // typical float value range: 0.0 - 1.0
+                   valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
                    explicitSizeInDp: Dp? = null,
                    minSizeInDp: Dp = defaultKnobMinSizeInDp,
                    tooltipColor: Color = Color.Gray,
@@ -45,7 +45,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
                            textColor = tooltipColor
                        )
                    },
-                   valueChanged: (value: Float) -> Unit = {}
+                   onValueChange: (value: Float) -> Unit = {}
 ) {
     // It is how `painterResource()` works.
     val context = LocalContext.current
@@ -60,12 +60,11 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
         modifier,
         imageBitmap,
         value,
-        minValue,
-        maxValue,
+        valueRange,
         explicitSizeInDp,
         minSizeInDp,
         tooltipColor,
         tooltip,
-        valueChanged
+        onValueChange
     )
 }

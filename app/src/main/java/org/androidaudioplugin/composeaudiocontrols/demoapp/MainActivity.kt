@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -11,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
 import org.androidaudioplugin.composeaudiocontrols.defaultKnobMinSizeInDp
 import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudioControlsTheme
+import kotlin.math.pow
 
 internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toBigDecimal().toPlainString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
 
@@ -66,7 +72,8 @@ fun KnobPreview() {
 
 @Composable
 fun ImageStripKnobDemo() {
-    Column {
+    val scrollState = rememberScrollState()
+    Column(Modifier.verticalScroll(scrollState)) {
         var minSizeCheckedState by remember { mutableStateOf(false) }
         Row {
             Text("use the original image size w/o min. size?")
@@ -85,12 +92,13 @@ fun ImageStripKnobDemo() {
                 Text("Parameter $paramIndex: ")
                 ImageStripKnob(drawableResId = knobStyle,
                     value = paramValue,
+                    valueRange = 0f..1f * 2f.pow(paramIndex.toFloat()),
                     minSizeInDp = if (minSizeCheckedState) 1.dp else if ((48 > (knobSize ?: 48))) knobSize!!.dp else defaultKnobMinSizeInDp,
                     explicitSizeInDp = knobSize?.dp,
                     //tooltip = { _,_ -> },
-                    valueChanged = {v ->
-                        paramValue = v
-                        println("value at $paramIndex changed: $v")
+                    onValueChange = {
+                        paramValue = it
+                        println("value at $paramIndex changed: $it")
                     })
                 Text(formatLabelNumber(paramValue, 7))
                 TextButton(onClick = { paramValue /= 2f} ) {

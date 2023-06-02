@@ -25,7 +25,7 @@ Text("Parameter $paramIndex: ")
 ImageStripKnob(
     drawableResId = R.drawable.knob_image,
     value = paramValue,
-    valueChanged = {v ->
+    onValueChange = {v ->
         paramValue = v
         println("value at $paramIndex changed: $v")
         })
@@ -39,7 +39,7 @@ Add the following `implementation` line to your dependencies list:
 
 ```groovy
 dependencies {
-    implementation `org.androidaudioplugin:compose-audio-controls:+` //replace `+` with your own
+    implementation 'org.androidaudioplugin:compose-audio-controls:+' //replace `+` with your own
 }
 ```
 

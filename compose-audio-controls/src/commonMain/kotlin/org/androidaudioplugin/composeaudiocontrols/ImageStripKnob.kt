@@ -59,7 +59,7 @@ internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toB
  * It is preserved for users who want to move out their finger of the knob and tooltip label.
  * Thus it is recommended to NOT assign another single-fingered drag operation over the knob.
  *
- * The value change size is simply from the delta value that Jetpack Compose foundation sends, so far.
+ * The whole min-to-max value change height on screen is `160.dp` which would be rational for most use cases.
  * We may change this behavior in the future versions.
  *
  * This function overload takes a `ImageBitmap`.
@@ -89,7 +89,7 @@ internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toB
  *  ImageStripKnob(
  *      drawableResId = R.drawable.knob_image,
  *      value = paramValue,
- *      valueChanged = {v ->
+ *      onValueChange = {v ->
  *          paramValue = v
  *          println("value at $paramIndex changed: $v")
  *          })
@@ -98,20 +98,18 @@ internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toB
  * @param modifier          A `Modifier` to be applied to this knob control.
  * @param imageBitmap       An `ImageBitMap` that contains the knob image strip.
  * @param value             The value that this knob should render for. It should be within the range between `minValue` and `maxValue`.
- * @param minValue          The minimum value, which defines the value range, along with `maxValue`. It defaults to `0f`
- * @param maxValue          The maximum value, which defines the value range, along with `minValue`. It defaults to `1f`
+ * @param valueRange        The value range. It defaults to `0f..1f`.
  * @param explicitSizeInDp  An optional size in Dp if you want an explicit rendered widget size instead of the sizes in image, in `Dp`.
  * @param minSizeInDp       The minimum rendered widget size in `Dp`. It defaults to `48.dp` which is the minimum recommended widget size by Android Accessibility Help.
  * @param tooltipColor      The color of the default implementation of the value label tooltip.
  * @param tooltip           The tooltip Composable which may be rendered in response to user's drag action over this knob.
- * @param valueChanged      An event handler function that takes the changed value. See the documentation for `ImageStripKnob` function for details.
+ * @param onValueChange     An event handler function that takes the changed value. See the documentation for `ImageStripKnob` function for details.
  */
 @Composable
 fun ImageStripKnob(modifier: Modifier = Modifier,
          imageBitmap: ImageBitmap,
          value: Float = 0f,
-         minValue: Float = 0f,
-         maxValue: Float = 1f,
+         valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
          explicitSizeInDp: Dp? = null,
          minSizeInDp: Dp = defaultKnobMinSizeInDp,
          tooltipColor: Color = Color.Gray,
@@ -123,14 +121,16 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
                  textColor = tooltipColor
              )
          },
-         valueChanged: (value: Float) -> Unit = {}
+         onValueChange: (value: Float) -> Unit = {}
          ) {
     // assuming these properties are cosmetic to acquire and thus can be computed every time...
     val knobSrcSizePx = imageBitmap.width
     val numKnobSlices = imageBitmap.height / imageBitmap.width
-    val valueDelta = (maxValue - minValue) / numKnobSlices
+    val max = valueRange.endInclusive
+    val min = valueRange.start
+    val valueDelta = (max - min) / numKnobSlices
 
-    val normalizedValue = if (value > maxValue) maxValue else if (value < minValue) minValue else value
+    val normalizedValue = if (value > max) max else if (value < min) min else value
     val imageIndex = min(numKnobSlices - 1, (normalizedValue / valueDelta).toInt())
 
     with(LocalDensity.current) {
@@ -138,11 +138,15 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
         val sizePx = explicitSizeInDp?.toPx() ?: if (minSizeInDp.toPx() > knobSrcSizePx) minSizeInDp.toPx() else knobSrcSizePx.toFloat()
 
         val draggableState = rememberDraggableState(onDelta = {
-            val v = value - it * 0.01f
-            val next = if (v < minValue) minValue else if (maxValue < v) maxValue else v
+            val deltaInDp = it.toDp()
+            // So far let's assume that 160dp = 1 inch for full motion range.
+            // 0.5 inch for half circle-ish.
+            val v = value - deltaInDp.value * valueDelta * 0.5f
+
+            val next = if (v < min) min else if (max < v) max else v
             isBeingDragged = true
             if (value != next)
-                valueChanged(next)
+                onValueChange(next)
         })
 
         Column {

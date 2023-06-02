@@ -18,6 +18,9 @@ plugins {
     id("me.tylerbwong.gradle.metalava") version "0.2.3"
 }
 
+group = "org.androidaudioplugin"
+version = "0.1.0"
+
 kotlin {
     jvmToolchain(17)
 
