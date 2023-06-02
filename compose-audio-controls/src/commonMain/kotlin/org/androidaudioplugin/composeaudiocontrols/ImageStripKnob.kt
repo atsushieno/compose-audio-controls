@@ -38,13 +38,15 @@ import kotlin.math.roundToInt
 
 // "Consider making touch targets at least 48x48dp, separated by 8dp of space or more, to ensure balanced information density and usability. "
 //  https://support.google.com/accessibility/android/answer/7101858?hl=en
-internal val defaultKnobMinSizeInDp = 48.dp
+val defaultKnobMinSizeInDp = 48.dp
 
 internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toBigDecimal().toPlainString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
 
 /**
  * Implements a knob control that is based on KnobMan image strip.
- * If you are not familiar with KnobMan, see this KVR page: https://www.kvraudio.com/product/knobman-by-g200kg
+ * If you are not familiar with KnobMan, see [this KVR page](https://www.kvraudio.com/product/knobman-by-g200kg).
+ *
+ * ### Using ImageStripKnob
  *
  * Start dragging vertically from the knob to change the value within the range between `minValue` and `maxValue` arguments.
  * You only need one finger. No pinch required.
@@ -58,7 +60,7 @@ internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toB
  * Thus it is recommended to NOT assign another single-fingered drag operation over the knob.
  *
  * The value change size is simply from the delta value that Jetpack Compose foundation sends, so far.
- * We may change this behavior in the future.
+ * We may change this behavior in the future versions.
  *
  * This function overload takes a `ImageBitmap`.
  * For Android drawable resources, you can use another ImageStripKnob() overload that takes the resource ID.
@@ -93,15 +95,16 @@ internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toB
  *          })
  * ```
  *
- * @param modifier      A `Modifier` to be applied to this knob control.
- * @param imageBitmap   An `ImageBitMap` that contains the knob image strip.
- * @param value         The value that this knob should render for. It should be within the range between `minValue` and `maxValue`.
- * @param minValue      The minimum value, which defines the value range, along with `maxValue`. It defaults to `0f`
- * @param maxValue      The maximum value, which defines the value range, along with `minValue`. It defaults to `1f`
- * @param minSizeInDp   The minimum rendered widget size in `Dp`. It defaults to `48.dp` which is the minimum recommended widget size by Android Accessibility Help.
- * @param tooltipColor  The color of the default implementation of the value label tooltip.
- * @param tooltip       The tooltip Composable which may be rendered in response to user's drag action over this knob.
- * @param valueChanged  An event handler function that takes the changed value. See the documentation for `ImageStripKnob` function for details.
+ * @param modifier          A `Modifier` to be applied to this knob control.
+ * @param imageBitmap       An `ImageBitMap` that contains the knob image strip.
+ * @param value             The value that this knob should render for. It should be within the range between `minValue` and `maxValue`.
+ * @param minValue          The minimum value, which defines the value range, along with `maxValue`. It defaults to `0f`
+ * @param maxValue          The maximum value, which defines the value range, along with `minValue`. It defaults to `1f`
+ * @param explicitSizeInDp  An optional size in Dp if you want an explicit rendered widget size instead of the sizes in image, in `Dp`.
+ * @param minSizeInDp       The minimum rendered widget size in `Dp`. It defaults to `48.dp` which is the minimum recommended widget size by Android Accessibility Help.
+ * @param tooltipColor      The color of the default implementation of the value label tooltip.
+ * @param tooltip           The tooltip Composable which may be rendered in response to user's drag action over this knob.
+ * @param valueChanged      An event handler function that takes the changed value. See the documentation for `ImageStripKnob` function for details.
  */
 @Composable
 fun ImageStripKnob(modifier: Modifier = Modifier,
@@ -109,6 +112,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
          value: Float = 0f,
          minValue: Float = 0f,
          maxValue: Float = 1f,
+         explicitSizeInDp: Dp? = null,
          minSizeInDp: Dp = defaultKnobMinSizeInDp,
          tooltipColor: Color = Color.Gray,
          tooltip: @Composable ImageStripKnobScope.() -> Unit = {
@@ -131,7 +135,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
 
     with(LocalDensity.current) {
         var isBeingDragged by remember { mutableStateOf(false) }
-        val sizePx = if (minSizeInDp.toPx() > knobSrcSizePx) minSizeInDp.toPx() else knobSrcSizePx.toFloat()
+        val sizePx = explicitSizeInDp?.toPx() ?: if (minSizeInDp.toPx() > knobSrcSizePx) minSizeInDp.toPx() else knobSrcSizePx.toFloat()
 
         val draggableState = rememberDraggableState(onDelta = {
             val v = value - it * 0.01f
