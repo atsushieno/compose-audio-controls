@@ -15,7 +15,7 @@ plugins {
     id("org.jetbrains.dokka")
     id("maven-publish")
     id("signing")
-    id("me.tylerbwong.gradle.metalava") version "0.2.3"
+    id("me.tylerbwong.gradle.metalava")
 }
 
 group = "org.androidaudioplugin"
@@ -75,9 +75,9 @@ kotlin {
 }
 
 metalava {
-    filename = "api/$name-api.txt"
-    outputKotlinNulls = false
-    includeSignatureVersion = false
+    filename.set("api/$name-api.txt")
+    outputKotlinNulls.set(false)
+    includeSignatureVersion.set(false)
 }
 
 android {
