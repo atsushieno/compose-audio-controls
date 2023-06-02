@@ -41,7 +41,7 @@ jobs:
       run: ./gradlew --warning-mode all build
     - name: publish (ONLY FOR NEW RELEASE TAGS)
       if: startsWith(github.ref, 'refs/tags/')
-      run: ./gradlew --warning-mode all build dokkaHtml publish
+      run: ./gradlew --warning-mode all publish dokkaHtml
       env:
         USERNAME: atsushieno
         GITHUB_TOKEN: ${{ secrets.MAVEN_PAT }}
