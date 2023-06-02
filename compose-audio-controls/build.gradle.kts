@@ -144,3 +144,8 @@ afterEvaluate {
     // keep it as is. It is replaced by CI release builds
     signing {}
 }
+
+// https://kotlinlang.slack.com/archives/C0F4UNJET/p1685393101873549?thread_ts=1685392725.401269&cid=C0F4UNJET
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    dependsOn(tasks.withType<Sign>())
+}
