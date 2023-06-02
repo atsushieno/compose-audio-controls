@@ -32,9 +32,7 @@ jobs:
     - name: rewrite build.gradle.kts to require signing
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        sed -i "s/signing {}/signing { sign(publishing.publications) }/" ktmidi/build.gradle.kts
-        sed -i "s/signing {}/signing { sign publishing.publications }/" ktmidi-jvm-desktop/build.gradle
-        sed -i "s/signing {}/signing { sign(publishing.publications) }/" ktmidi-native-ext/build.gradle.kts
+        sed -i "s/signing {}/signing { sign(publishing.publications) }/" compose-audio-controls/build.gradle.kts
 
     # build or publish, depending on whether it is for release tags or not
     - name: build (ONLY FOR NON-RELEASES)
@@ -65,7 +63,7 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: ktmidi-artifacts
+        name: library-artifacts
         path: |
           compose-audio-controls/build/libs/*.jar
           compose-audio-controls/build/outputs/aar/*.aar
@@ -77,4 +75,4 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@4.1.2
       with:
         branch: gh-pages
-        folder: ktmidi/build/dokka/html
+        folder: compose-audio-controls/build/dokka/html
