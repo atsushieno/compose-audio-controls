@@ -7,7 +7,7 @@ for audio apps. Well, actually currently we only have a Knob control implementat
 
 ![ImageStripKnob demoapp](docs/images/ImageStripKnob.png)
 
-`ImageStripKnob` is a knob audio control based on an image strip.
+[`ImageStripKnob`](https://atsushieno.github.io/compose-audio-controls/compose-audio-controls/org.androidaudioplugin.composeaudiocontrols/-image-strip-knob.html) is a knob audio control based on an image strip.
 
 ### KnobMan image strip
 
