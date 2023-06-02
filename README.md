@@ -25,6 +25,8 @@ Sometimes we want fine-tuning. If you hold 1000 milliseconds (by default) it wil
 
 A value label tooltip will be shown when you drag over the knob. Your finger may be hiding it though; you can move the finger to left or right without changing value (to make it possible, we assign no horizontal control, at least for now). The tooltip is customizible - you can pass any `@Composable`.
 
+It should be noted that `ImageStripKnob` is NOT a Material Design based component. You would be able to add some animation effects by your own (we also welcome contribution if it's optional and looking generally useful).
+
 ### Usage example
 
 ```kotlin
@@ -39,9 +41,7 @@ ImageStripKnob(
         })
 ```
 
-Note that `ImageStripKnob` is NOT a Material Design component. You would be able to add some animation effects by your own (we also welcome contribution if it's optional and looking generally useful).
-
-It should be also noted that support for Android resource ID is specific to Android platform. If your project is Kotlin Multiplatform, use `ImageBitmap` instead.
+Noted that support for Android resource ID is specific to Android platform. If your project is Kotlin Multiplatform, use `ImageBitmap` instead.
 
 ## Using compose-audio-controls
 
@@ -59,4 +59,4 @@ The API reference is published at https://atsushieno.github.io/compose-audio-con
 
 compose-audio-controls is released under the MIT license.
 
-The sample app contains some public-domain images from KnobGallery (including my own).
+The sample app contains some public-domain images from KnobGallery.
