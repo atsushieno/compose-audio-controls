@@ -29,6 +29,8 @@ import java.time.temporal.ValueRange
  * @param tooltip           The tooltip Composable which may be rendered in response to user's drag action over this knob.
  * @param onValueChange     An event handler function that takes the changed value. See the documentation for `ImageStripKnob` function for details.
  */
+
+// Make sure to update the default values in Common module too.
 @Composable
 fun ImageStripKnob(modifier: Modifier = Modifier,
                    @DrawableRes drawableResId: Int,
@@ -36,6 +38,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
                    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
                    explicitSizeInDp: Dp? = null,
                    minSizeInDp: Dp = defaultKnobMinSizeInDp,
+                   fineModeDelayMs: Int = 1000,
                    tooltipColor: Color = Color.Gray,
                    tooltip: @Composable ImageStripKnobScope.() -> Unit = {
                        // by default, show tooltip only when it is being dragged
@@ -63,6 +66,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
         valueRange,
         explicitSizeInDp,
         minSizeInDp,
+        fineModeDelayMs,
         tooltipColor,
         tooltip,
         onValueChange

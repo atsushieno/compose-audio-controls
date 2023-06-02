@@ -1,7 +1,9 @@
 package org.androidaudioplugin.composeaudiocontrols
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.LayoutScopeMarker
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -18,14 +21,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -50,6 +58,8 @@ internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toB
  *
  * Start dragging vertically from the knob to change the value within the range between `minValue` and `maxValue` arguments.
  * You only need one finger. No pinch required.
+ *
+ * If you hold over the knob for 1000 milliseconds (by default), it will enter "fine mode" where the value change is multiplied by 0.1.
  *
  * Value labels are rendered when it is dragged below the knob, by default.
  *
@@ -101,19 +111,23 @@ internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toB
  * @param valueRange        The value range. It defaults to `0f..1f`.
  * @param explicitSizeInDp  An optional size in Dp if you want an explicit rendered widget size instead of the sizes in image, in `Dp`.
  * @param minSizeInDp       The minimum rendered widget size in `Dp`. It defaults to `48.dp` which is the minimum recommended widget size by Android Accessibility Help.
+ * @param fineModeDelayMs   The wait time for "hold to fine mode", in milliseconds. Pass huge value if you want to disable it. 1000 by default.
  * @param tooltipColor      The color of the default implementation of the value label tooltip.
  * @param tooltip           The tooltip Composable which may be rendered in response to user's drag action over this knob.
  * @param onValueChange     An event handler function that takes the changed value. See the documentation for `ImageStripKnob` function for details.
  */
+
+// Make sure to update the default values in Android module too.
 @Composable
 fun ImageStripKnob(modifier: Modifier = Modifier,
-         imageBitmap: ImageBitmap,
-         value: Float = 0f,
-         valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-         explicitSizeInDp: Dp? = null,
-         minSizeInDp: Dp = defaultKnobMinSizeInDp,
-         tooltipColor: Color = Color.Gray,
-         tooltip: @Composable ImageStripKnobScope.() -> Unit = {
+                   imageBitmap: ImageBitmap,
+                   value: Float = 0f,
+                   valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+                   explicitSizeInDp: Dp? = null,
+                   minSizeInDp: Dp = defaultKnobMinSizeInDp,
+                   fineModeDelayMs: Int = 1000,
+                   tooltipColor: Color = Color.Gray,
+                   tooltip: @Composable ImageStripKnobScope.() -> Unit = {
              // by default, show tooltip only when it is being dragged
              DefaultKnobTooltip(
                  value = knobValue,
@@ -133,15 +147,23 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
     val normalizedValue = if (value > max) max else if (value < min) min else value
     val imageIndex = min(numKnobSlices - 1, (normalizedValue / valueDelta).toInt())
 
+    var lastDragActionTimeInMillis by remember { mutableStateOf(0L) }
+    var inFineHoldMode by remember { mutableStateOf(false) }
+
     with(LocalDensity.current) {
         var isBeingDragged by remember { mutableStateOf(false) }
         val sizePx = explicitSizeInDp?.toPx() ?: if (minSizeInDp.toPx() > knobSrcSizePx) minSizeInDp.toPx() else knobSrcSizePx.toFloat()
 
         val draggableState = rememberDraggableState(onDelta = {
             val deltaInDp = it.toDp()
+
+            inFineHoldMode = inFineHoldMode || System.currentTimeMillis() - lastDragActionTimeInMillis > fineModeDelayMs
+            lastDragActionTimeInMillis = System.currentTimeMillis()
+
             // So far let's assume that 160dp = 1 inch for full motion range.
             // 0.5 inch for half circle-ish.
-            val v = value - deltaInDp.value * valueDelta * 0.5f
+            val inFineMode = inFineHoldMode // TODO: detect shift key state too i.e. shift+drag is also "fine mode".
+            val v = value - deltaInDp.value * valueDelta * 0.5f * if (inFineMode) 0.1f else 1f
 
             val next = if (v < min) min else if (max < v) max else v
             isBeingDragged = true
@@ -163,7 +185,19 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
                 modifier = modifier
                     // our settings take higher priority
                     .draggable(draggableState, Orientation.Vertical,
-                        onDragStopped = { isBeingDragged = false })
+                        onDragStopped = {
+                            isBeingDragged = false
+                            inFineHoldMode = false
+                        })
+                    .pointerInput(Unit) {
+                        // It is registered apart from onDragStarted, as onDragStarted will not be fired until its first motion, not press.
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitFirstDown()
+                                lastDragActionTimeInMillis = System.currentTimeMillis()
+                            }
+                        }
+                    }
                     .size(sizePx.toDp())
             )
             ImageStripKnobScopeData(value, isBeingDragged).tooltip()
