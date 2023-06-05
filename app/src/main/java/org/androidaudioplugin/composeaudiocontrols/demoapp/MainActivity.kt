@@ -4,15 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,7 +15,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,11 +25,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.androidaudioplugin.composeaudiocontrols.DiatonicKeyboard
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
 import org.androidaudioplugin.composeaudiocontrols.defaultKnobMinSizeInDp
 import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudioControlsTheme
@@ -54,7 +48,20 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ImageStripKnobDemo()
+                    Column {
+                        val noteOnStates = remember { List(128) { 0 }.toMutableStateList() }
+                        DiatonicKeyboard(noteOnStates.toList(),
+                            onNoteOn = { note, _ ->
+                                println("NoteOn: $note")
+                                noteOnStates[note] = 1
+                            },
+                            onNoteOff = { note, _ ->
+                                println("NoteOff: $note")
+                                noteOnStates[note] = 0
+                            }
+                        )
+                        ImageStripKnobDemo()
+                    }
                 }
             }
         }
@@ -72,8 +79,7 @@ fun KnobPreview() {
 
 @Composable
 fun ImageStripKnobDemo() {
-    val scrollState = rememberScrollState()
-    Column(Modifier.verticalScroll(scrollState)) {
+    Column {
         var minSizeCheckedState by remember { mutableStateOf(false) }
         Row {
             Text("use the original image size w/o min. size?")
@@ -86,23 +92,28 @@ fun ImageStripKnobDemo() {
         var knobStyle by remember { mutableStateOf(R.drawable.bright_life) }
         KnobStyleSelector(knobStyle, onSelectionChange = { knobStyle = it })
 
-        (0 until 10).forEach { paramIndex ->
-            Row {
-                var paramValue by remember { mutableStateOf(0f) }
-                Text("Parameter $paramIndex: ")
-                ImageStripKnob(drawableResId = knobStyle,
-                    value = paramValue,
-                    valueRange = 0f..1f * 2f.pow(paramIndex.toFloat()),
-                    minSizeInDp = if (minSizeCheckedState) 1.dp else if ((48 > (knobSize ?: 48))) knobSize!!.dp else defaultKnobMinSizeInDp,
-                    explicitSizeInDp = knobSize?.dp,
-                    //tooltip = { _,_ -> },
-                    onValueChange = {
-                        paramValue = it
-                        println("value at $paramIndex changed: $it")
-                    })
-                Text(formatLabelNumber(paramValue, 7))
-                TextButton(onClick = { paramValue /= 2f} ) {
-                    Text("divide by 2", modifier = Modifier.border(1.dp, Color.Black))
+        val scrollState = rememberScrollState()
+        Column(Modifier.verticalScroll(scrollState)) {
+            (0 until 10).forEach { paramIndex ->
+                Row {
+                    var paramValue by remember { mutableStateOf(0f) }
+                    Text("Parameter $paramIndex: ")
+                    ImageStripKnob(drawableResId = knobStyle,
+                        value = paramValue,
+                        valueRange = 0f..1f * 2f.pow(paramIndex.toFloat()),
+                        minSizeInDp = if (minSizeCheckedState) 1.dp else if ((48 > (knobSize
+                                ?: 48))
+                        ) knobSize!!.dp else defaultKnobMinSizeInDp,
+                        explicitSizeInDp = knobSize?.dp,
+                        //tooltip = { _,_ -> },
+                        onValueChange = {
+                            paramValue = it
+                            println("value at $paramIndex changed: $it")
+                        })
+                    Text(formatLabelNumber(paramValue, 7))
+                    TextButton(onClick = { paramValue /= 2f }) {
+                        Text("divide by 2", modifier = Modifier.border(1.dp, Color.Black))
+                    }
                 }
             }
         }
