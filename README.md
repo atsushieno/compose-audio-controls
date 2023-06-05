@@ -1,7 +1,7 @@
 # Compose Audio Controls
 
 It is a repository for Jetpack Compose / Compose for Multiplatform widgets
-for audio apps. Well, actually currently we only have a Knob control implementation.
+for audio apps.
 
 ## ImageStripKnob
 
@@ -42,6 +42,38 @@ ImageStripKnob(
 ```
 
 Noted that support for Android resource ID is specific to Android platform. If your project is Kotlin Multiplatform, use `ImageBitmap` instead.
+
+## DiatonicKeyboard
+
+![DiatonicKeyboard sshot](docs/images/DiatonicKeyboard.png)
+
+[`DiatonicKeyboard`](https://atsushieno.github.io/compose-audio-controls/compose-audio-controls/org.androidaudioplugin.composeaudiocontrols/-diatonic-keyboard.html) is a diatonic music keyboard control.
+
+Its event handlers receive note number (and additional information in the next versions, unused argument so far).
+
+### DiatonicKeyboard UI implementation
+
+It is designed to be touchable on screen but not to become small as a musical keyboard.
+One optimization made there is different pointer treat on touches and mouse/stylus.
+For touches, the target note is calculated based on the nearest to the center of the keys.
+On the other hand, if the input type is mouse or stylus, it expects exact insets.
+
+### Usage example
+
+```kotlin
+val noteOnStates = remember { List(128) { 0 }.toMutableStateList() }
+DiatonicKeyboard(noteOnStates.toList(),
+    // you will also insert actual musical operations within these lambdas
+    onNoteOn = { note, _ ->
+        noteOnStates[note] = 1
+        println("note on: $note")
+    },
+    onNoteOff = { note, _ ->
+        noteOnStates[note] = 0
+        println("note off: $note")
+    }
+)
+```
 
 ## Using compose-audio-controls
 
