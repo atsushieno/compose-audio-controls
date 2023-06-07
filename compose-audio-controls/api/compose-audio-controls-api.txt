@@ -1,7 +1,7 @@
 package org.androidaudioplugin.composeaudiocontrols {
 
   public final class DiatonicKeyboardKt {
-    method @androidx.compose.runtime.Composable public static void DiatonicKeyboard(optional @NonNull java.util.List<java.lang.Integer> noteOnStates, optional @NonNull androidx.compose.ui.Modifier modifier, optional @NonNull kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Long,kotlin.Unit> onNoteOn, optional @NonNull kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Long,kotlin.Unit> onNoteOff, optional int startOctaveFromZero, optional int numWhiteKeys, optional float whiteKeyWidth, optional float blackKeyHeight, optional @Nullable androidx.compose.ui.unit.Dp totalWidth, optional float totalHeight, optional long whiteNoteOnColor, optional long blackNoteOnColor, optional long whiteKeyColor, optional long blackKeyColor);
+    method @androidx.compose.runtime.Composable public static void DiatonicKeyboard(optional @NonNull java.util.List<java.lang.Long> noteOnStates, optional @NonNull androidx.compose.ui.Modifier modifier, optional @NonNull kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Long,kotlin.Unit> onNoteOn, optional @NonNull kotlin.jvm.functions.Function2<? super java.lang.Integer,? super java.lang.Long,kotlin.Unit> onNoteOff, optional @NonNull kotlin.jvm.functions.Function3<? super org.androidaudioplugin.composeaudiocontrols.NoteExpressionOrigin,? super java.lang.Integer,? super java.lang.Float,kotlin.Unit> onExpression, optional @NonNull org.androidaudioplugin.composeaudiocontrols.MoveAction moveAction, optional int octaveZeroBased, optional int numWhiteKeys, optional int expressionDragSensitivity, optional float whiteKeyWidth, optional float blackKeyHeight, optional @Nullable androidx.compose.ui.unit.Dp totalWidth, optional float totalHeight, optional long whiteNoteOnColor, optional long blackNoteOnColor, optional long whiteKeyColor, optional long blackKeyColor);
   }
 
   public final class ImageStripKnobKt {
@@ -20,6 +20,21 @@ package org.androidaudioplugin.composeaudiocontrols {
 
   public final class ImageStripKnob_androidKt {
     method @androidx.compose.runtime.Composable public static void ImageStripKnob(optional @NonNull androidx.compose.ui.Modifier modifier, @DrawableRes int drawableResId, optional float value, optional @NonNull kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange, optional @Nullable androidx.compose.ui.unit.Dp explicitSizeInDp, optional float minSizeInDp, optional int fineModeDelayMs, optional long tooltipColor, optional @NonNull kotlin.jvm.functions.Function1<? super org.androidaudioplugin.composeaudiocontrols.ImageStripKnobScope,kotlin.Unit> tooltip, optional @NonNull kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueChange);
+  }
+
+  public enum MoveAction {
+    method @NonNull public static org.androidaudioplugin.composeaudiocontrols.MoveAction valueOf(@NonNull String name) throws java.lang.IllegalArgumentException;
+    method @NonNull public static org.androidaudioplugin.composeaudiocontrols.MoveAction[] values();
+    enum_constant public static final org.androidaudioplugin.composeaudiocontrols.MoveAction NoteChange;
+    enum_constant public static final org.androidaudioplugin.composeaudiocontrols.MoveAction NoteExpression;
+  }
+
+  public enum NoteExpressionOrigin {
+    method @NonNull public static org.androidaudioplugin.composeaudiocontrols.NoteExpressionOrigin valueOf(@NonNull String name) throws java.lang.IllegalArgumentException;
+    method @NonNull public static org.androidaudioplugin.composeaudiocontrols.NoteExpressionOrigin[] values();
+    enum_constant public static final org.androidaudioplugin.composeaudiocontrols.NoteExpressionOrigin HorizontalDragging;
+    enum_constant public static final org.androidaudioplugin.composeaudiocontrols.NoteExpressionOrigin Pressure;
+    enum_constant public static final org.androidaudioplugin.composeaudiocontrols.NoteExpressionOrigin VerticalDragging;
   }
 
   public final class ScalingPainter extends androidx.compose.ui.graphics.painter.Painter {

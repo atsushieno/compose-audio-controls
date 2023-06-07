@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderPositions
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,11 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.androidaudioplugin.composeaudiocontrols.DiatonicKeyboard
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
+import org.androidaudioplugin.composeaudiocontrols.MoveAction
+import org.androidaudioplugin.composeaudiocontrols.NoteExpressionOrigin
 import org.androidaudioplugin.composeaudiocontrols.defaultKnobMinSizeInDp
 import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudioControlsTheme
 import kotlin.math.pow
@@ -49,17 +55,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column {
-                        val noteOnStates = remember { List(128) { 0 }.toMutableStateList() }
-                        DiatonicKeyboard(noteOnStates.toList(),
-                            onNoteOn = { note, _ ->
-                                println("NoteOn: $note")
-                                noteOnStates[note] = 1
-                            },
-                            onNoteOff = { note, _ ->
-                                println("NoteOff: $note")
-                                noteOnStates[note] = 0
-                            }
-                        )
+                        DiatonicKeyboardDemo()
                         ImageStripKnobDemo()
                     }
                 }
@@ -183,4 +179,56 @@ fun KnobStyleSelector(currentResId: Int, onSelectionChange: (id: Int) -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun DiatonicKeyboardDemo() {
+    var noteExpressionMode by remember { mutableStateOf(false) }
+    var expressionMaxSizeInDp by remember { mutableStateOf(80f) }
+    var octave by remember { mutableStateOf(5f) }
+    val exprAlpha = if (noteExpressionMode) 1.0f else 0.3f
+    Row {
+        Text("Expr. Sense", modifier = Modifier.width(110.dp))
+        Text("${expressionMaxSizeInDp.toInt()}", modifier = Modifier.width(30.dp).alpha(exprAlpha))
+        Checkbox(
+            checked = noteExpressionMode,
+            onCheckedChange = { noteExpressionMode = !noteExpressionMode })
+        Slider(
+            enabled = noteExpressionMode,
+            modifier = Modifier.width(80.dp),
+            value = expressionMaxSizeInDp,
+            valueRange = 32f..320f,
+            onValueChange = { expressionMaxSizeInDp = it })
+        Text("Oct. ${octave.toInt()}")
+        Slider(modifier = Modifier.width(80.dp), value = octave, valueRange = 0f..9f, onValueChange = { octave = it })
+    }
+
+    val noteOnStates = remember { List(128) { 0L }.toMutableStateList() }
+    var expressionX by remember { mutableStateOf(0f) }
+    var expressionY by remember { mutableStateOf(0f) }
+    var expressionP by remember { mutableStateOf(0f) }
+    Text("Expression (latest) X: ${expressionX.toString().take(5)} / Y: ${expressionY.toString().take(5)} / P:  ${expressionP.toString().take(5)}",
+        modifier = Modifier.alpha(exprAlpha))
+    DiatonicKeyboard(noteOnStates.toList(),
+        octaveZeroBased = octave.toInt(),
+        onNoteOn = { note, _ ->
+            println("NoteOn: $note")
+            noteOnStates[note] = 1
+        },
+        onNoteOff = { note, _ ->
+            println("NoteOff: $note")
+            noteOnStates[note] = 0
+        },
+        onExpression = { dir, note, data ->
+            println("Note Expression at $note: $dir $data")
+            when (dir) {
+                NoteExpressionOrigin.HorizontalDragging -> expressionX = data
+                NoteExpressionOrigin.VerticalDragging -> expressionY = data
+                NoteExpressionOrigin.Pressure -> expressionP = data
+                else -> {}
+            }
+        },
+        expressionDragSensitivity = expressionMaxSizeInDp.toInt(),
+        moveAction = if (noteExpressionMode) MoveAction.NoteExpression else MoveAction.NoteChange
+    )
 }
