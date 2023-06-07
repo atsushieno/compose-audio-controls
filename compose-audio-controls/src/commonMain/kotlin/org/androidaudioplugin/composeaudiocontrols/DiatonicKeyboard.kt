@@ -1,11 +1,14 @@
 package org.androidaudioplugin.composeaudiocontrols
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -14,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -26,7 +30,6 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -57,7 +60,7 @@ private fun getNoteFromPosition(noteRectMap: Map<Int,Rect>, pointerType: Pointer
 /**
  * Used by `DiatonicKeyboard` to indicate which type of operation a dragging control should result in.
  */
-enum class MoveAction {
+enum class DiatonicKeyboardMoveAction {
     /**
      * Indicates that it should simply switch to the next note i.e. "note off" on the old note, and "note on" at the new pointer location.
      */
@@ -73,7 +76,7 @@ enum class MoveAction {
 /**
  * Used by `onExpression` lambda parameter in `DiatonicKeyboard`, as `origin` parameter.
  */
-enum class NoteExpressionOrigin {
+enum class DiatonicKeyboardNoteExpressionOrigin {
     /**
      * Indicates that the data origin is the delta value in horizontal dragging.
      * In `DiatonicKeyboard`, the value range is `-1f..1f`.
@@ -95,7 +98,8 @@ enum class NoteExpressionOrigin {
 
 /**
  * Implements a diatonic music keyboard.
- * It reacts to touch (or click) events and fires note on/off callbacks.
+ * It reacts to touch (or click) events and fires note on/off callbacks, as well as note expression
+ * callbacks per pointer drag events and pressure events if it is configured as such.
  *
  * ### Using DiatonicKeyboard
  *
@@ -104,9 +108,10 @@ enum class NoteExpressionOrigin {
  * Note "details" is UNUSED in the current version, but will contain (1)velocity for MIDI 1.0, and
  * (2)velocity + note attributes for MIDI 2.0. They can be originated from touch pressure etc.
  *
- * It can also send "note expressions" alike, if `MoveAction.NoteExpression` is specified at `moveAction` parameter.
- * Then `onExpression` event will be raised for dragging operation. It is done per pointer, so
- * it works like an MPE (or MIDI 2.0) keyboard. Events are sent for both X and Y axes.
+ * It can also send "note expressions" alike, if `DiatonicKeyboardMoveAction.NoteExpression` is specified at `moveAction` parameter.
+ * Then `onExpression` event will be raised for dragging operation and touch pressure changes.
+ * It is done per pointer, so it works like an MPE (or MIDI 2.0) keyboard.
+ * Dragging events are sent for both X and Y axes.
  *
  * ### Customizing keyboard
  *
@@ -131,6 +136,11 @@ enum class NoteExpressionOrigin {
  * Instead, the target note is calculated based on the nearest to the center of the keys.
  * On the other hand, if the input type is mouse or stylus, it expects exact insets.
  *
+ * Regarding drag events for note expressions, the valid motion range is -80dp..80dp from the initial point, by default.
+ * They are then mapped to -1f..1f value range when `onExpression` callback is invoked.
+ *
+ * Regarding touch events for note expressions, the value semantics depends on whatever device sends.
+ *
  * ### Usage example
  *
  * Here is an example (complicated) use of DiatonicKeyboard():
@@ -142,11 +152,13 @@ enum class NoteExpressionOrigin {
  *     onNoteOn = { note, _ -> noteOnStates[note] = 1 },
  *     onNoteOff = { note, _ -> noteOnStates[note] = 0 },
  *     // use below only if you need MIDI 2.0 / MPE compat keyboard
- *     moveAction = MoveAction.NoteExpression,
+ *     moveAction = DiatonicKeyboardMoveAction.NoteExpression,
  *     onExpression = { origin, note, data ->
  *         when (origin) {
- *             NoteExpressionOrigin.Horizontal) -> perNotePitchBend(note, data / 2f + 0.5f) }
- *             NoteExpressionOrigin.Horizontal) -> polyphonicPressure(note, data / 2f + 0.5f) }
+ *             DiatonicKeyboardNoteExpressionOrigin.Horizontal) ->
+ *                 perNotePitchBend(note, data / 2f + 0.5f) }
+ *             DiatonicKeyboardNoteExpressionOrigin.Vertical) ->
+ *                 polyphonicPressure(note, data / 2f + 0.5f) }
  *             else -> {}
  *         }
  *     }
@@ -163,7 +175,8 @@ enum class NoteExpressionOrigin {
  *                          The value range for `data` sent to the handler depends on the target `origin`.
  *                          For `HorizontalDragging` and `VerticalDragging` they are `-1.0f..1.0f`.
  *                          For `Pressure` it is up to device.
- * @param moveAction        indicates that how dragging works. See the documentation on `MoveAction` enumeration type.
+ * @param moveAction        indicates that how dragging works. See the documentation on `DiatonicKeyboardMoveAction` enumeration type.
+ *                          `NoteChange` by default.
  * @param octaveZeroBased   the octave (in zero-based counting i.e. 0 to 9 or 10 (up to `numWhiteKeys`). `4` by default.
  * @param numWhiteKeys      the number of white keys to be rendered. `14` by default (which means 2 octaves)
  * @param expressionDragSensitivity    a sensitivity parameter over note expression dragging.
@@ -188,8 +201,8 @@ fun DiatonicKeyboard(noteOnStates: List<Long> = List(128) { 0L },
                      modifier: Modifier = Modifier,
                      onNoteOn: (note: Int, reserved: Long) -> Unit = { _,_ -> },
                      onNoteOff: (note: Int, reserved: Long) -> Unit = { _,_ -> },
-                     onExpression: (origin: NoteExpressionOrigin, note: Int, data: Float) -> Unit = {_,_,_ -> },
-                     moveAction: MoveAction = MoveAction.NoteChange,
+                     onExpression: (origin: DiatonicKeyboardNoteExpressionOrigin, note: Int, data: Float) -> Unit = {_,_,_ -> },
+                     moveAction: DiatonicKeyboardMoveAction = DiatonicKeyboardMoveAction.NoteChange,
                      octaveZeroBased: Int = 4,
                      numWhiteKeys: Int = 14, // 2 octaves
                      expressionDragSensitivity: Int = 80, // in dp; 0.5 inch for 0..0.5 value changes (and will run towards both negative and positive)
@@ -227,7 +240,7 @@ fun DiatonicKeyboard(noteOnStates: List<Long> = List(128) { 0L },
                             if (note != null) {
                                 //println("Press: change ${it.id} ${it.type} ${it.position} -> $note")
                                 pointerIdToNote[it.id] = note
-                                if (moveAction == MoveAction.NoteExpression) {
+                                if (moveAction == DiatonicKeyboardMoveAction.NoteExpression) {
                                     pointerIdToInitialOffset[it.id] = it.position
                                     pointerIdToPressure[it.id] = it.pressure
                                 }
@@ -239,7 +252,7 @@ fun DiatonicKeyboard(noteOnStates: List<Long> = List(128) { 0L },
                     PointerEventType.Move -> {
                         currentEvent.changes.forEach {
                             //println("Move: change ${it.id} ${it.type} ${it.position}")
-                            if (moveAction == MoveAction.NoteChange) {
+                            if (moveAction == DiatonicKeyboardMoveAction.NoteChange) {
                                 val note = getNoteFromPosition(noteRectMap.toMap(), it.type, it.position)
                                 if (note != null && note != pointerIdToNote[it.id]) {
                                     pointerIdToInitialOffset.remove(it.id)
@@ -252,20 +265,20 @@ fun DiatonicKeyboard(noteOnStates: List<Long> = List(128) { 0L },
                                 val deltaMaxDp = expressionDragSensitivity.toFloat() // calculate only once
                                 val deltaX = (it.position.x - pointerIdToInitialOffset[it.id]!!.x).toDp().value
                                 val dataX = min(deltaMaxDp, max(-deltaMaxDp, deltaX)) / deltaMaxDp
-                                onExpression(NoteExpressionOrigin.HorizontalDragging, note, dataX)
+                                onExpression(DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging, note, dataX)
                                 val deltaY = (it.position.y - pointerIdToInitialOffset[it.id]!!.y).toDp().value
                                 val dataY = min(deltaMaxDp, max(-deltaMaxDp, deltaY)) / deltaMaxDp
-                                onExpression(NoteExpressionOrigin.VerticalDragging, note, dataY)
+                                onExpression(DiatonicKeyboardNoteExpressionOrigin.VerticalDragging, note, dataY)
                                 val originalPressure = pointerIdToPressure[it.id]
                                 if (originalPressure != null && it.pressure != originalPressure)
-                                    onExpression(NoteExpressionOrigin.Pressure, note, it.pressure - originalPressure)
+                                    onExpression(DiatonicKeyboardNoteExpressionOrigin.Pressure, note, it.pressure - originalPressure)
                             }
                         }
                     }
                     PointerEventType.Release -> {
                         currentEvent.changes.forEach {
                             //println("Release: change ${it.id} ${it.type} ${it.position}")
-                            if (moveAction == MoveAction.NoteExpression) {
+                            if (moveAction == DiatonicKeyboardMoveAction.NoteExpression) {
                                 pointerIdToInitialOffset.remove(it.id)
                                 pointerIdToPressure.remove(it.id)
                             }
@@ -304,11 +317,15 @@ fun DiatonicKeyboard(noteOnStates: List<Long> = List(128) { 0L },
                 drawLine(start = Offset(x = x, y = 0f), end = Offset(x = x, y = (bkWidth * 0.5f).toPx()), color = blackKeyColor)
             }
 
+            // black keys follow.
+
             for (i in 0 until numWhiteKeys) {
                 val x = i * wkWidth.toPx()
                 val bkOffset = blackKeyOffsets[i % 7] * wkWidth.toPx()
                 if (bkOffset != 0f) {
                     val note = (octaveZeroBased + i / 7) * 12 + whiteKeyToNotes[i % 7] + 1
+                    if (note >= 128)
+                        break
                     val isNoteOn = note in 0..127 && noteOnStates[note] != 0L
                     val rect = Rect(Offset(x = x + bkOffset + wkWidth.toPx() / 2, y = 0f), Size(bkWidth.toPx(), bkHeight.toPx()))
                     noteRectMap[note] = rect
@@ -324,4 +341,107 @@ fun DiatonicKeyboard(noteOnStates: List<Long> = List(128) { 0L },
             drawLine(start = Offset(x = size.width, y = 0f), end = Offset(x = size.width, y = (bkWidth * 0.5f).toPx()), color = Color.Black)
         }
     }
+}
+
+/**
+ * It is a compound set of `DiatonicKeyboard` with the following controllers:
+ *
+ * - it can toggle `NoteExpression` mode
+ * - it can change the note expression sensitivity using slider. It ranges from`32` to `320` (2 inches).
+ * - it can change the base octave.
+ *
+ * The list of parameters are almost identical to `DiatonicKeyboard`, except:
+ *
+ * - some parameters are named "initial",
+ * - there are showXXX parameters that indicate whether it should render each controllers.
+ *
+ * For more details, see `DiatonicKeyboard` documentation.
+ *
+ * @param noteOnStates      a List of Long that holds note states. It must contain 128 elements.
+ *                          Currently it only expects that note on state holds non-zero value.
+ * @param modifier          a Modifier that applies to its top level Column.
+ * @param onNoteOn          an event handler that is called when a key for a note is pressed
+ * @param onNoteOff         an event handler that is called when a key for a note is released
+ * @param onExpression      an event handler that is called when note expression events occur,
+ *                          by dragging (if indicated so by `moveAction`).
+ *                          The value range for `data` sent to the handler depends on the target `origin`.
+ *                          For `HorizontalDragging` and `VerticalDragging` they are `-1.0f..1.0f`.
+ *                          For `Pressure` it is up to device.
+ * @param showNoteExpressionToggle   indicates whether the mode (note change vs. note expression) toggle switch is rendered. `true` by default.
+ * @param showExpressionSensitivitySlider    indicates whether the expression sensitivity slider is rendered. `true` by default.
+ * @param showOctaveSlider  indicates whether the octave slider is rendered. `true` by default.
+ * @param initialMoveAction indicates the initial value of `moveAction` that how dragging works. See the documentation on `DiatonicKeyboardMoveAction` enumeration type.
+ *                          `NoteChange` by default.
+ * @param initialOctaveZeroBased   the initial value of octave (in zero-based counting i.e. 0 to 9 or 10 (up to `numWhiteKeys`). `4` by default.
+ * @param numWhiteKeys      the number of white keys to be rendered. `14` by default (which means 2 octaves)
+ * @param initialExpressionDragSensitivity    the initial value of the sensitivity parameter over note expression dragging.
+ *                                     The value is treated as a `Dp` value that corresponds to the width
+ *                                     for "half" of the motion size towards max or min value.
+ *                                     `80` (Dp) by default.
+ * @param whiteKeyWidth     The display size for one white key width. `30.dp` by default.
+ * @param blackKeyHeight    The display size for black key height. `35.dp` by default.
+ * @param totalWidth        The display size for the whole keyboard control.
+ *                          It is automatically calculated as `whiteKeyWidth * numWhiteKeys` but you can change it.
+ *                          Alternatively, you can explicitly specify `null` then it will take use `Modifier.fillMaxSize()`
+ *                          (but note that the number of the rendered key is governed by `numWhiteKeys` anyways).
+ * @param totalHeight       The display size for the whole keyboard control. It also means white key height. `60.dp` by default.
+ * @param whiteNoteOnColor  A `Color` value for the note on indication on the white keys. `Color.Cyan` by default.
+ * @param blackNoteOnColor  A `Color` value for the note on indication on the black keys. `whiteNoteOnColor` by default.
+ * @param whiteKeyColor     A `Color` value for the white keys (when not at note-on state). `Color.White` by default.
+ * @param blackKeyColor     A `Color` value for the black keys (when not at note-on state). `Color.Black` by default.
+ */
+@Composable
+fun DiatonicKeyboardWithControllers(noteOnStates: List<Long> = List(128) { 0L },
+                                    modifier: Modifier = Modifier,
+                                    onNoteOn: (note: Int, reserved: Long) -> Unit = { _,_ -> },
+                                    onNoteOff: (note: Int, reserved: Long) -> Unit = { _,_ -> },
+                                    onExpression: (origin: DiatonicKeyboardNoteExpressionOrigin, note: Int, data: Float) -> Unit = {_,_,_ -> },
+                                    showNoteExpressionToggle: Boolean = true,
+                                    showExpressionSensitivitySlider: Boolean = true,
+                                    showOctaveSlider: Boolean = true,
+                                    initialMoveAction: DiatonicKeyboardMoveAction = DiatonicKeyboardMoveAction.NoteChange,
+                                    initialOctaveZeroBased: Int = 4,
+                                    numWhiteKeys: Int = 14, // 2 octaves
+                                    initialExpressionDragSensitivity: Int = 80, // in dp; 0.5 inch for 0..0.5 value changes (and will run towards both negative and positive)
+                                    whiteKeyWidth: Dp = 30.dp,
+                                    blackKeyHeight: Dp = 35.dp,
+                                    totalWidth: Dp? = whiteKeyWidth * numWhiteKeys,
+                                    totalHeight: Dp = 60.dp,
+                                    whiteNoteOnColor: Color = Color.Cyan,
+                                    blackNoteOnColor: Color = whiteNoteOnColor,
+                                    whiteKeyColor: Color = Color.White,
+                                    blackKeyColor: Color = Color.Black) {
+
+    var noteExpressionMode by remember { mutableStateOf(initialMoveAction == DiatonicKeyboardMoveAction.NoteExpression) }
+    var expressionDragSensitivity by remember { mutableStateOf(initialExpressionDragSensitivity.toFloat()) }
+    var octave by remember { mutableStateOf(initialOctaveZeroBased.toFloat()) }
+    val exprAlpha = if (noteExpressionMode) 1.0f else 0.3f
+    if (showNoteExpressionToggle || showExpressionSensitivitySlider || showOctaveSlider) {
+        Row {
+            if (showNoteExpressionToggle && !showExpressionSensitivitySlider)
+                Text("Expression Mode", modifier = Modifier.width(140.dp))
+            else if (showExpressionSensitivitySlider)
+                Text("Expr. Sense", modifier = Modifier.width(110.dp))
+            if (showExpressionSensitivitySlider)
+                Text("${expressionDragSensitivity.toInt()}", modifier = Modifier.width(30.dp).alpha(exprAlpha))
+            if (showNoteExpressionToggle)
+                Checkbox(checked = noteExpressionMode, onCheckedChange = { noteExpressionMode = !noteExpressionMode })
+            if (showExpressionSensitivitySlider)
+                Slider(enabled = noteExpressionMode, modifier = Modifier.width(80.dp),
+                    value = expressionDragSensitivity, valueRange = 32f..320f, onValueChange = { expressionDragSensitivity = it })
+            if (showOctaveSlider) {
+                Text("Oct. ${octave.toInt()}")
+                Slider(modifier = Modifier.width(80.dp),
+                    value = octave, valueRange = 0f..9f, onValueChange = { octave = it })
+            }
+        }
+    }
+
+    DiatonicKeyboard(noteOnStates, modifier, onNoteOn, onNoteOff, onExpression,
+        if (noteExpressionMode) DiatonicKeyboardMoveAction.NoteExpression else DiatonicKeyboardMoveAction.NoteChange,
+        octave.toInt(),
+        numWhiteKeys,
+        expressionDragSensitivity.toInt(),
+        whiteKeyWidth, blackKeyHeight, totalWidth, totalHeight, whiteNoteOnColor, blackNoteOnColor, whiteKeyColor, blackKeyColor
+    )
 }

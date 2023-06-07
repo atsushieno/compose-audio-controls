@@ -49,7 +49,23 @@ Noted that support for Android resource ID is specific to Android platform. If y
 
 [`DiatonicKeyboard`](https://atsushieno.github.io/compose-audio-controls/compose-audio-controls/org.androidaudioplugin.composeaudiocontrols/-diatonic-keyboard.html) is a diatonic music keyboard control.
 
+In addition, [`DiatonicKeyboardWithControllers`](https://atsushieno.github.io/compose-audio-controls/compose-audio-controls/org.androidaudioplugin.composeaudiocontrols/-diatonic-keyboard-with-controllers.html) adds some controllers for the parameters (explained below) to the keyboard. It takes extra space, but makes it more convenient.
+
 Its event handlers receive note number (and additional information in the next versions, unused argument so far).
+
+It supports touch motions. There are two modes regarding how they are handled, up to "moveAction" 
+parameter:
+
+- `NoteChange`: when it is dragged to another note region, a note off for current note and a new note on will be sent.
+- `NoteExpression`: when it is dragged, it will trigger `onNoteExpression` callback, for horizontal and vertical dragging, plus the pointer "pressure" if it is supported by device.
+
+Take it like, it works as an MPE (or MIDI 2.0) keyboard too.
+Note that note changes and note expressions are exclusive behaviors (we cannot do both).
+Note expression support works only if it is explicitly enabled.
+
+The default note expression ranges on screen is 160.dp, 80dp on all directions (L <-> R, T <-> B).
+The value sent to `onExpression` event handler ranges between `-1.0f..1.0f`.
+It is up to you what kind of controls to assign, on X axis, Y axis, and pressure.
 
 ### DiatonicKeyboard UI implementation
 
