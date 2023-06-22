@@ -1,5 +1,6 @@
 package org.androidaudioplugin.composeaudiocontrols.demoapp
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -31,15 +34,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.atsushieno.ktmidi.AndroidMidiAccess
+import dev.atsushieno.ktmidi.MidiAccess
+import dev.atsushieno.ktmidi.MidiChannelStatus
+import dev.atsushieno.ktmidi.MidiEvent
+import dev.atsushieno.ktmidi.MidiOutput
+import dev.atsushieno.ktmidi.MidiPortDetails
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.androidaudioplugin.composeaudiocontrols.DiatonicKeyboardNoteExpressionOrigin
 import org.androidaudioplugin.composeaudiocontrols.DiatonicKeyboardWithControllers
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
 import org.androidaudioplugin.composeaudiocontrols.defaultKnobMinSizeInDp
 import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudioControlsTheme
+import kotlin.math.min
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toBigDecimal().toPlainString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
 
@@ -54,10 +69,76 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column {
-                        DiatonicKeyboardDemo()
+                        val context = LocalContext.current
+                        val scope by remember { mutableStateOf( KtMidiDeviceAccessScope(context)) }
+                        scope.MidiDeviceSelector()
+                        scope.DiatonicKeyboardDemo()
                         ImageStripKnobDemo()
                     }
                 }
+            }
+        }
+    }
+}
+
+interface MidiDeviceAccessScope {
+    val outputs: List<MidiPortDetails>
+    val currentOutput: MidiOutput?
+    val onSelectionChange: (Int) -> Unit
+}
+
+class KtMidiDeviceAccessScope(context: Context) : MidiDeviceAccessScope {
+    val access = AndroidMidiAccess(context)
+    private var output: MidiOutput? = null
+
+
+    override val outputs: List<MidiPortDetails>
+        get() = access.outputs.toList()
+    override val currentOutput: MidiOutput?
+        get() = output
+
+    @OptIn(DelicateCoroutinesApi::class)
+    override val onSelectionChange: (Int) -> Unit
+        get() = { index ->
+            GlobalScope.launch {
+                output?.close()
+                output = access.openOutput(outputs[index].id)
+                println("Opened Midi Output: ${outputs[index].name}")
+            }
+        }
+}
+
+@Composable
+private fun KtMidiDeviceAccessScope.MidiDeviceSelector() {
+    // Since KtMidiDeviceAccessScope is composable, this deviceIndex state is hoisted here.
+    var deviceIndex by remember { mutableStateOf(-1) }
+    KtMidiDeviceSelector(selectedMidiDeviceIndex = deviceIndex,
+        midiOutDeviceList = access.outputs.toList(),
+        onSelectionChange = {
+            deviceIndex = it
+            onSelectionChange(it)
+        })
+}
+
+@Composable
+fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
+                       selectedMidiDeviceIndex: Int,
+                       midiOutDeviceList: List<MidiPortDetails>,
+                       onSelectionChange: (Int) -> Unit = { _ -> }) {
+    Column {
+        var listExpanded by remember { mutableStateOf(false) }
+        val currentText =
+            if (selectedMidiDeviceIndex < 0)
+                "(Select MIDI OUT)"
+            else
+                midiOutDeviceList[selectedMidiDeviceIndex].name ?: "(unknown port)"
+        Button(onClick = { listExpanded = true}) { Text(currentText) }
+        DropdownMenu(modifier = modifier, expanded = listExpanded, onDismissRequest = { listExpanded = false }) {
+            midiOutDeviceList.forEachIndexed { index, device ->
+                DropdownMenuItem(text = { Text(device.name ?: "(unknown port)") }, onClick = {
+                    onSelectionChange(index)
+                    listExpanded = false
+                })
             }
         }
     }
@@ -67,7 +148,9 @@ class MainActivity : ComponentActivity() {
 fun SectionLabel(text: String) {
     Divider()
     Text(text, fontSize = 20.sp, color = MaterialTheme.colorScheme.inversePrimary,
-        modifier = Modifier.padding(10.dp).background(MaterialTheme.colorScheme.inverseSurface))
+        modifier = Modifier
+            .padding(10.dp)
+            .background(MaterialTheme.colorScheme.inverseSurface))
     Divider()
 }
 
@@ -192,14 +275,14 @@ fun KnobStyleSelector(currentResId: Int, onSelectionChange: (id: Int) -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun DiatonicKeyboardPreview() {
+fun MidiDeviceAccessScope.DiatonicKeyboardPreview() {
     ComposeAudioControlsTheme {
         DiatonicKeyboardDemo()
     }
 }
 
 @Composable
-fun DiatonicKeyboardDemo() {
+fun MidiDeviceAccessScope.DiatonicKeyboardDemo() {
     Column {
         SectionLabel("DiagnosticKeyboard Demo")
 
@@ -221,20 +304,34 @@ fun DiatonicKeyboardDemo() {
         var expressionY by remember { mutableStateOf(0f) }
         var expressionP by remember { mutableStateOf(0f) }
 
+        var range = 0f.rangeTo(1f)
+
         DiatonicKeyboardWithControllers(
             noteOnStates.toList(),
             showNoteExpressionToggle = showExprToggle,
             showExpressionSensitivitySlider = showSense,
             showOctaveSlider = showOctave,
             onNoteOn = { note, _ ->
+                currentOutput?.send(byteArrayOf(MidiChannelStatus.NOTE_ON.toByte(), note.toByte(), 120), 0, 3, 0)
                 println("NoteOn: $note")
                 noteOnStates[note] = 1
             },
             onNoteOff = { note, _ ->
+                currentOutput?.send(byteArrayOf(MidiChannelStatus.NOTE_OFF.toByte(), note.toByte(), 120), 0, 3, 0)
                 println("NoteOff: $note")
                 noteOnStates[note] = 0
             },
             onExpression = { dir, note, data ->
+                // MIDI 1.0 mode: Pitch Bend for horizontal moves
+                if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {
+                    val dataIn7Bit = min(127, ((data * 64f).roundToInt() + 64)).toByte()
+                    println(dataIn7Bit)
+                    currentOutput?.send(byteArrayOf(MidiChannelStatus.PITCH_BEND.toByte(), 0, dataIn7Bit), 0, 3, 0)
+                }
+                if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {
+                    val dataIn7Bit = min(127, ((data * 64f).roundToInt() + 64)).toByte()
+                    currentOutput?.send(byteArrayOf(MidiChannelStatus.PAF.toByte(), note.toByte(), dataIn7Bit), 0, 3, 0)
+                }
                 println("Note Expression at $note: $dir $data")
                 when (dir) {
                     DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging -> expressionX = data

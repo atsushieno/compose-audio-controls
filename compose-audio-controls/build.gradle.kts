@@ -44,6 +44,8 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 api(compose.ui)
+
+                implementation(libs.ktmidi)
             }
         }
         val commonTest by getting {
