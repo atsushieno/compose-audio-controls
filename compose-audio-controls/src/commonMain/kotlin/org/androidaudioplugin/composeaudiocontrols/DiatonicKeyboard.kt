@@ -256,7 +256,9 @@ fun DiatonicKeyboard(noteOnStates: List<Long> = List(128) { 0L },
                                 val note = getNoteFromPosition(noteRectMap.toMap(), it.type, it.position)
                                 if (note != null && note != pointerIdToNote[it.id]) {
                                     pointerIdToInitialOffset.remove(it.id)
-                                    onNoteOff(pointerIdToNote.remove(it.id)!!, 0)
+                                    val existing = pointerIdToNote.remove(it.id)
+                                    if (existing != null)
+                                        onNoteOff(existing, 0)
                                     pointerIdToNote[it.id] = note
                                     onNoteOn(note, 127)
                                 }
