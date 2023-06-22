@@ -2,7 +2,9 @@ package org.androidaudioplugin.composeaudiocontrols.demoapp
 
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,9 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.atsushieno.ktmidi.AndroidMidiAccess
-import dev.atsushieno.ktmidi.MidiAccess
 import dev.atsushieno.ktmidi.MidiChannelStatus
-import dev.atsushieno.ktmidi.MidiEvent
 import dev.atsushieno.ktmidi.MidiOutput
 import dev.atsushieno.ktmidi.MidiPortDetails
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -55,6 +55,7 @@ import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudio
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
+import kotlin.system.exitProcess
 
 internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toBigDecimal().toPlainString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
 
@@ -78,6 +79,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        onBackPressedDispatcher.addCallback(object: OnBackPressedCallback(true) {
+            private var lastBackPressed = System.currentTimeMillis()
+            override fun handleOnBackPressed() {
+                if (System.currentTimeMillis() - lastBackPressed < 2000) {
+                    finish()
+                    exitProcess(0)
+                }
+                else
+                    Toast.makeText(this@MainActivity, "Tap once more to quit", Toast.LENGTH_SHORT).show()
+                lastBackPressed = System.currentTimeMillis()
+            }
+        })
     }
 }
 
