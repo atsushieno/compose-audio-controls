@@ -4,6 +4,8 @@ import android.content.Context
 import dev.atsushieno.ktmidi.AndroidMidiAccess
 import dev.atsushieno.ktmidi.MidiOutput
 import dev.atsushieno.ktmidi.MidiPortDetails
+import dev.atsushieno.ktmidi.UmpFactory
+import dev.atsushieno.ktmidi.toPlatformNativeBytes
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -39,8 +41,14 @@ class KtMidiDeviceAccessScope(context: Context) : MidiDeviceAccessScope {
             }
         }
 
+    private fun midi2EndpointConfiguration(protocol: Byte) =
+        UmpFactory.streamConfigRequest(protocol, rxJRTimestamp = false, txJRTimestamp = true)
+            .toPlatformNativeBytes()
+
     override val onMidiProtocolChange: (Boolean) -> Unit
         get() = {
+            val bytes = midi2EndpointConfiguration(if (it) 2 else 1)
+            output?.send(bytes, 0, bytes.size, 0)
             midi2 = it
         }
 }
