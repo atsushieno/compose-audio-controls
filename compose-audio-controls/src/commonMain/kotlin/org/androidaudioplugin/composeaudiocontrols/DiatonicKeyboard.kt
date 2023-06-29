@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -421,18 +422,18 @@ fun DiatonicKeyboardWithControllers(noteOnStates: List<Long> = List(128) { 0L },
     if (showNoteExpressionToggle || showExpressionSensitivitySlider || showOctaveSlider) {
         Row {
             if (showNoteExpressionToggle && !showExpressionSensitivitySlider)
-                Text("Expression Mode", modifier = Modifier.width(140.dp))
+                Text("Expression Mode", modifier = Modifier.width(140.dp).align(Alignment.CenterVertically))
             else if (showExpressionSensitivitySlider)
-                Text("Expr. Sense", modifier = Modifier.width(110.dp))
+                Text("Expr. Sense", modifier = Modifier.width(110.dp).align(Alignment.CenterVertically))
             if (showExpressionSensitivitySlider)
-                Text("${expressionDragSensitivity.toInt()}", modifier = Modifier.width(30.dp).alpha(exprAlpha))
+                Text("${expressionDragSensitivity.toInt()}", modifier = Modifier.width(30.dp).alpha(exprAlpha).align(Alignment.CenterVertically))
             if (showNoteExpressionToggle)
                 Checkbox(checked = noteExpressionMode, onCheckedChange = { noteExpressionMode = !noteExpressionMode })
             if (showExpressionSensitivitySlider)
                 Slider(enabled = noteExpressionMode, modifier = Modifier.width(80.dp),
                     value = expressionDragSensitivity, valueRange = 32f..320f, onValueChange = { expressionDragSensitivity = it })
             if (showOctaveSlider) {
-                Text("Oct. ${octave.toInt()}")
+                Text("Oct. ${octave.toInt()}", modifier = Modifier.align(Alignment.CenterVertically))
                 Slider(modifier = Modifier.width(80.dp),
                     value = octave, valueRange = 0f..9f, onValueChange = { octave = it })
             }
