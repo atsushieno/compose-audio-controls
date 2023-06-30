@@ -1,5 +1,7 @@
 # Compose Audio Controls
 
+![demoapp sshot](docs/images/demoapp-sshot.png)
+
 It is a repository for Jetpack Compose / Compose for Multiplatform widgets
 for audio apps.
 
