@@ -139,7 +139,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
     val valueDelta = (max - min) / numKnobSlices
 
     val normalizedValue = if (value > max) max else if (value < min) min else value
-    val imageIndex = min(numKnobSlices - 1, (normalizedValue / valueDelta).toInt())
+    val imageIndex = min(numKnobSlices - 1, ((normalizedValue - min) / valueDelta).toInt())
 
     var lastDragActionTimeInMillis by remember { mutableStateOf(0L) }
     var inFineHoldMode by remember { mutableStateOf(false) }
