@@ -11,7 +11,7 @@ buildscript {
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "1.4.0" // FIXME: can we avoid this? It may conflict with BOM
+    id("org.jetbrains.compose")
     id("org.jetbrains.dokka")
     id("maven-publish")
     id("signing")
@@ -19,7 +19,7 @@ plugins {
 }
 
 group = "org.androidaudioplugin"
-version = "0.1.3"
+version = "0.1.4"
 
 kotlin {
     jvmToolchain(17)
