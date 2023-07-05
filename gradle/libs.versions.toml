@@ -5,11 +5,10 @@ core-ktx = "1.10.1"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
-kotlinx-coroutines-core = "1.7.0"
+kotlinx-coroutines-core = "1.6.4"
 lifecycle-runtime-ktx = "2.6.1"
 activity-compose = "1.7.2"
-compose-plugin = "1.4.0"
-compose-bom = "2023.06.01"
+compose-bom = "2023.05.01"
 metalava-gradle = "0.3.3"
 dokka = "1.8.10"
 ktmidi_version = "0.5.0"
@@ -38,7 +37,6 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 dokkaPlugin = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 metalavaPlugin = { id = "me.tylerbwong.gradle.metalava", version.ref = "metalava-gradle" }
-composePlugin = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 
 [bundles]
 

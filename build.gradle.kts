@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlinAndroid) apply false
     alias(libs.plugins.dokkaPlugin) apply false
     alias(libs.plugins.metalavaPlugin) apply false
-    alias(libs.plugins.composePlugin) apply false
 }
 
 // Use system environment variables
