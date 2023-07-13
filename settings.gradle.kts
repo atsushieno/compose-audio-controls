@@ -10,9 +10,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(uri("https://jitpack.io"))
     }
 }
 
 rootProject.name = "ComposeAudioControls"
 include(":app")
 include(":compose-audio-controls")
+include(":aap-resident-midi-keyboard")
