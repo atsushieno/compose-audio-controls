@@ -1,6 +1,6 @@
 package org.androidaudioplugin.composeaudiocontrols.midi {
 
-  public final class DiatonicKeyboardDemoKt {
+  public final class DiatonicLiveMidiKeyboardKt {
     method @androidx.compose.runtime.Composable public static void DiatonicLiveMidiKeyboard(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope);
   }
 
