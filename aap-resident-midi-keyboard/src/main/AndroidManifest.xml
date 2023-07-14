@@ -25,6 +25,7 @@
             </intent-filter>
         </activity>
         <service android:name="org.androidaudioplugin.residentmidikeyboard.MidiKeyboardService" android:exported="false" />
+        <service android:name="org.androidaudioplugin.residentmidikeyboard.MidiKeyboardViewService" android:exported="true" />
     </application>
 
 </manifest>

@@ -4,18 +4,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
-import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
-import android.os.Message
-import android.os.Messenger
-import android.view.SurfaceControlViewHost
 import android.view.View
 import android.view.WindowManager
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -26,12 +18,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistry
@@ -71,7 +60,7 @@ fun TitleBar(text: String) {
     )
 }
 
-class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
+open class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
     @Composable
     fun OverlayDraggableContainer(
         modifier: Modifier = Modifier,
@@ -104,16 +93,22 @@ class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
     private lateinit var view: View
 
 
-    private fun createComposeView() = ComposeView(this).apply {
+    fun createComposeView() = ComposeView(this).apply {
         setViewTreeLifecycleOwner(this@MidiKeyboardService)
         setViewTreeSavedStateRegistryOwner(this@MidiKeyboardService)
 
         setContent {
             Column(Modifier.background(Color.White)) {
                 OverlayDraggableContainer {
-                    Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.inverseSurface)) {
+                    Row(
+                        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.inverseSurface)
+                    ) {
                         IconButton(onClick = { windowManager.removeView(view) }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "close button", modifier = Modifier.background(MaterialTheme.colorScheme.surface))
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "close button",
+                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                            )
                         }
                         TitleBar("ResidentMIDIKeyboard")
                     }
@@ -237,99 +232,5 @@ class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
 
         startForeground(1, notification)
     }
-
-    // SurfaceControlViewHost support
-    companion object {
-        // requests
-        const val MESSAGE_KEY_OPCODE = "opcode"
-        const val MESSAGE_KEY_HOST_TOKEN = "hostToken"
-        const val MESSAGE_KEY_DISPLAY_ID = "displayId"
-        const val MESSAGE_KEY_WIDTH = "width"
-        const val MESSAGE_KEY_HEIGHT = "height"
-        // replies
-        const val MESSAGE_KEY_SURFACE_PACKAGE = "surfacePackage"
-
-        const val OPCODE_CONNECT = 0
-        const val OPCODE_DISCONNECT = 1
-    }
-
-    private lateinit var messenger: Messenger
-
-    lateinit var host: SurfaceControlViewHost
-
-    override fun onBind(intent: Intent): IBinder? {
-        messenger = Messenger(MidiKeyboardViewControllerHandler(Looper.myLooper()!!, this))
-        return messenger.binder
-    }
-
-    private class MidiKeyboardViewControllerHandler(
-        looper: Looper,
-        private val owner: MidiKeyboardService
-    ) : Handler(looper) {
-
-        @RequiresApi(Build.VERSION_CODES.R)
-        override fun handleMessage(msg: Message) {
-            when (msg.data.getInt(MESSAGE_KEY_OPCODE)) {
-                OPCODE_CONNECT -> {
-                    owner.handleCreateRequest(msg)
-                }
-
-                OPCODE_DISCONNECT -> {
-                    owner.handleDisposeRequest(msg)
-                }
-
-                else -> {}
-            }
-        }
-    }
-
-    private var controller: Controller? = null
-
-    private fun handleCreateRequest(msg: Message) {
-        val messenger = msg.replyTo
-        val hostToken = msg.data.getBinder(MESSAGE_KEY_HOST_TOKEN)!!
-        val displayId = msg.data.getInt(MESSAGE_KEY_DISPLAY_ID)
-        val width = msg.data.getInt(MESSAGE_KEY_WIDTH)
-        val height = msg.data.getInt(MESSAGE_KEY_HEIGHT)
-
-        controller = Controller(this)
-        controller!!.initialize(messenger, hostToken, displayId, width, height)
-    }
-
-    private fun handleDisposeRequest(msg: Message) {
-        controller?.close()
-    }
-
-    class Controller(private val service: MidiKeyboardService) : AutoCloseable {
-        private lateinit var viewHost: SurfaceControlViewHost
-
-        fun initialize(messengerToSendReply: Messenger, hostToken: IBinder, displayId: Int, width: Int, height: Int) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val display = service.getSystemService(DisplayManager::class.java)
-                    .getDisplay(displayId)
-
-                service.mainLooper.queue.addIdleHandler {
-                    viewHost = SurfaceControlViewHost(service, display, hostToken).apply {
-
-
-                        val view = service.createComposeView()
-
-                        setView(view, width, height)
-
-                        messengerToSendReply.send(Message.obtain().apply {
-                            data = bundleOf(
-                                MESSAGE_KEY_SURFACE_PACKAGE to surfacePackage)
-                        })
-                    }
-                    false
-                }
-            }
-        }
-
-        override fun close() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                viewHost.release()
-            }
-        }
-    }
 }
+
