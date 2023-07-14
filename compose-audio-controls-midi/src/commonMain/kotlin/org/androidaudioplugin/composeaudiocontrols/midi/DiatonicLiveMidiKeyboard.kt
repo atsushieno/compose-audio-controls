@@ -56,13 +56,13 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
                     // Pitch Bend for horizontal moves
                     if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {
                         val v32 = min(0xFFFF_FFFFL, (((data + 1.0) / 2.0) * 0x1_0000_0000L).roundToLong())
-                        val i64 = UmpFactory.midi2PitchBend(0, 0, v32)
+                        val i64 = UmpFactory.midi2PitchBendDirect(0, 0, v32)
                         currentOutput?.send(Ump(i64).toPlatformNativeBytes(), 0, 8, 0)
                     }
                     // Per-Note Pitch Bend for vertical moves
                     if (dir == DiatonicKeyboardNoteExpressionOrigin.VerticalDragging) {
                         val v32 = min(0xFFFF_FFFFL, (((data + 1.0) / 2.0) * 0x1_0000_0000L).roundToLong())
-                        val i64 = UmpFactory.midi2PerNotePitchBend(0, 0, note, v32)
+                        val i64 = UmpFactory.midi2PerNotePitchBendDirect(0, 0, note, v32)
                         currentOutput?.send(Ump(i64).toPlatformNativeBytes(), 0, 8, 0)
                     }
                     // MIDI 2.0 PAf for pressure
