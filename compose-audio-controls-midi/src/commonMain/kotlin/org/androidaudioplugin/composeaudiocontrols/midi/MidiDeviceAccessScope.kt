@@ -1,7 +1,6 @@
-package org.androidaudioplugin.composeaudiocontrols.demoapp
+package org.androidaudioplugin.composeaudiocontrols.midi
 
-import android.content.Context
-import dev.atsushieno.ktmidi.AndroidMidiAccess
+import dev.atsushieno.ktmidi.MidiAccess
 import dev.atsushieno.ktmidi.MidiOutput
 import dev.atsushieno.ktmidi.MidiPortDetails
 import dev.atsushieno.ktmidi.UmpFactory
@@ -14,12 +13,12 @@ interface MidiDeviceAccessScope {
     val outputs: List<MidiPortDetails>
     val currentOutput: MidiOutput?
     val useMidi2Protocol: Boolean
-    val onSelectionChange: (Int) -> Unit
-    val onMidiProtocolChange: (Boolean) -> Unit
+    fun onSelectionChange(index: Int)
+    fun onMidiProtocolChange(useMidi2: Boolean)
+    fun cleanup()
 }
 
-class KtMidiDeviceAccessScope(context: Context) : MidiDeviceAccessScope {
-    val access = AndroidMidiAccess(context)
+class KtMidiDeviceAccessScope(val access: MidiAccess) : MidiDeviceAccessScope {
     private var output: MidiOutput? = null
     private var midi2 = false
 
@@ -32,23 +31,25 @@ class KtMidiDeviceAccessScope(context: Context) : MidiDeviceAccessScope {
         get() = midi2
 
     @OptIn(DelicateCoroutinesApi::class)
-    override val onSelectionChange: (Int) -> Unit
-        get() = { index ->
-            GlobalScope.launch {
-                output?.close()
-                output = access.openOutput(outputs[index].id)
-                println("Opened Midi Output: ${outputs[index].name}")
-            }
+    override fun onSelectionChange(index: Int) {
+        GlobalScope.launch {
+            output?.close()
+            output = access.openOutput(outputs[index].id)
+            println("Opened Midi Output: ${outputs[index].name}")
         }
+    }
 
     private fun midi2EndpointConfiguration(protocol: Byte) =
         UmpFactory.streamConfigRequest(protocol, rxJRTimestamp = false, txJRTimestamp = true)
             .toPlatformNativeBytes()
 
-    override val onMidiProtocolChange: (Boolean) -> Unit
-        get() = {
-            val bytes = midi2EndpointConfiguration(if (it) 2 else 1)
-            output?.send(bytes, 0, bytes.size, 0)
-            midi2 = it
-        }
+    override fun onMidiProtocolChange (useMidi2: Boolean) {
+        val bytes = midi2EndpointConfiguration(if (useMidi2) 2 else 1)
+        output?.send(bytes, 0, bytes.size, 0)
+        midi2 = useMidi2
+    }
+
+    override fun cleanup() {
+        output?.close()
+    }
 }

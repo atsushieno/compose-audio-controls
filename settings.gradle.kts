@@ -18,3 +18,4 @@ rootProject.name = "ComposeAudioControls"
 include(":app")
 include(":compose-audio-controls")
 include(":aap-resident-midi-keyboard")
+include(":compose-audio-controls-midi")

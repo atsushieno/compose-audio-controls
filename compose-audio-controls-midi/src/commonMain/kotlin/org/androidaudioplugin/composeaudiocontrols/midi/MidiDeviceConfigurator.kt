@@ -1,4 +1,4 @@
-package org.androidaudioplugin.resident_midi_keyboard.keyboard
+package org.androidaudioplugin.composeaudiocontrols.midi
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,12 +44,12 @@ fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
 }
 
 @Composable
-fun KtMidiDeviceAccessScope.MidiDeviceConfigurator() {
+fun MidiDeviceAccessScope.MidiDeviceConfigurator() {
     Row {
         // Since KtMidiDeviceAccessScope is composable, this deviceIndex state is hoisted here.
         var deviceIndex by remember { mutableStateOf(-1) }
         KtMidiDeviceSelector(selectedMidiDeviceIndex = deviceIndex,
-            midiOutDeviceList = access.outputs.toList(),
+            midiOutDeviceList = outputs.toList(),
             onSelectionChange = {
                 deviceIndex = it
                 onSelectionChange(it)

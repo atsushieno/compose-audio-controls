@@ -1,6 +1,5 @@
 package org.androidaudioplugin.resident_midi_keyboard
 
-import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -23,9 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.NotificationCompat
+import dev.atsushieno.ktmidi.AndroidMidiAccess
 import dev.jeziellago.compose.markdowntext.MarkdownText
-import org.androidaudioplugin.resident_midi_keyboard.keyboard.MidiKeyboardMain
+import org.androidaudioplugin.composeaudiocontrols.midi.MidiKeyboardMain
 import org.androidaudioplugin.resident_midi_keyboard.ui.theme.ComposeAudioControlsTheme
 import kotlin.system.exitProcess
 
@@ -95,6 +94,6 @@ There are three ways to use this MIDI keyboard:
             Text("Launch overlay permission settings")
         }
 
-        MidiKeyboardMain()
+        MidiKeyboardMain(AndroidMidiAccess(context))
     }
 }

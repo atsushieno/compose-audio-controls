@@ -1,20 +1,12 @@
-package org.androidaudioplugin.resident_midi_keyboard.keyboard
+package org.androidaudioplugin.composeaudiocontrols.midi
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import dev.atsushieno.ktmidi.MidiChannelStatus
 import dev.atsushieno.ktmidi.Ump
 import dev.atsushieno.ktmidi.UmpFactory
@@ -26,19 +18,7 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 @Composable
-fun SectionLabel(text: String) {
-    Divider()
-    Text(
-        text, fontSize = 20.sp, color = MaterialTheme.colorScheme.inversePrimary,
-        modifier = Modifier
-            .padding(10.dp)
-            .background(MaterialTheme.colorScheme.inverseSurface)
-    )
-    Divider()
-}
-
-@Composable
-fun MidiDeviceAccessScope.DiatonicKeyboardDemo() {
+fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
     Column {
         val noteOnStates = remember { List(128) { 0L }.toMutableStateList() }
         var expressionX by remember { mutableStateOf(0f) }

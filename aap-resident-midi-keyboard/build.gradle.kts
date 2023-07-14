@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.ktmidi)
 
     implementation(project(":compose-audio-controls"))
+    implementation(project(":compose-audio-controls-midi"))
     implementation(libs.compose.markdown)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.service)

@@ -46,6 +46,7 @@ kotlin {
                 api(compose.ui)
 
                 implementation(libs.ktmidi)
+                implementation(project(":compose-audio-controls"))
             }
         }
         val commonTest by getting {
@@ -83,7 +84,7 @@ metalava {
 }
 
 android {
-    namespace = "org.androidaudioplugin.composeaudiocontrols"
+    namespace = "org.androidaudioplugin.composeaudiocontrols.midi"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["test"].assets.srcDir("src/commonTest/resources") // kind of hack...
     defaultConfig {
@@ -109,8 +110,8 @@ afterEvaluate {
         publications.withType<MavenPublication> {
             artifact(javadocJar)
             pom {
-                name.set("compose-audio-controls")
-                description.set("Collection of Audio Controls (WIP) for Jetpack Compose and Compose for Multiplatform")
+                name.set("compose-audio-controls-midi")
+                description.set("Collection of Audio Controls (WIP) for Jetpack Compose and Compose for Multiplatform - MIDI support extensibility")
                 url.set("https://github.com/atsushieno/compose-audio-controls")
                 scm {
                     url.set("https://github.com/atsushieno/compose-audio-controls")

@@ -1,0 +1,45 @@
+package org.androidaudioplugin.composeaudiocontrols.midi {
+
+  public final class DiatonicKeyboardDemoKt {
+    method @androidx.compose.runtime.Composable public static void DiatonicLiveMidiKeyboard(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope);
+  }
+
+  public final class KtMidiDeviceAccessScope implements org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope {
+    ctor public KtMidiDeviceAccessScope(@NonNull dev.atsushieno.ktmidi.MidiAccess access);
+    method public void cleanup();
+    method @NonNull public dev.atsushieno.ktmidi.MidiAccess getAccess();
+    method @Nullable public dev.atsushieno.ktmidi.MidiOutput getCurrentOutput();
+    method @NonNull public java.util.List<dev.atsushieno.ktmidi.MidiPortDetails> getOutputs();
+    method public boolean getUseMidi2Protocol();
+    method public void onMidiProtocolChange(boolean useMidi2);
+    method public void onSelectionChange(int index);
+    property @NonNull public final dev.atsushieno.ktmidi.MidiAccess access;
+    property @Nullable public dev.atsushieno.ktmidi.MidiOutput currentOutput;
+    property @NonNull public java.util.List<dev.atsushieno.ktmidi.MidiPortDetails> outputs;
+    property public boolean useMidi2Protocol;
+  }
+
+  public interface MidiDeviceAccessScope {
+    method public void cleanup();
+    method @Nullable public dev.atsushieno.ktmidi.MidiOutput getCurrentOutput();
+    method @NonNull public java.util.List<dev.atsushieno.ktmidi.MidiPortDetails> getOutputs();
+    method public boolean getUseMidi2Protocol();
+    method public void onMidiProtocolChange(boolean useMidi2);
+    method public void onSelectionChange(int index);
+    property @Nullable public abstract dev.atsushieno.ktmidi.MidiOutput currentOutput;
+    property @NonNull public abstract java.util.List<dev.atsushieno.ktmidi.MidiPortDetails> outputs;
+    property public abstract boolean useMidi2Protocol;
+  }
+
+  public final class MidiDeviceConfiguratorKt {
+    method @androidx.compose.runtime.Composable public static void KtMidiDeviceSelector(optional @NonNull androidx.compose.ui.Modifier modifier, int selectedMidiDeviceIndex, @NonNull java.util.List<? extends dev.atsushieno.ktmidi.MidiPortDetails> midiOutDeviceList, optional @NonNull kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> onSelectionChange);
+    method @androidx.compose.runtime.Composable public static void MidiDeviceConfigurator(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope);
+  }
+
+  public final class MidiKeyboardMainKt {
+    method @androidx.compose.runtime.Composable public static void MidiKeyboardMain(@NonNull dev.atsushieno.ktmidi.MidiAccess access);
+    method @androidx.compose.runtime.Composable public static void MidiKeyboardMain(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope);
+  }
+
+}
+

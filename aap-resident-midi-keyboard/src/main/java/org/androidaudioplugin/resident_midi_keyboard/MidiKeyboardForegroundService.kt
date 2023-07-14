@@ -5,17 +5,18 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.Build
+import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
@@ -40,9 +40,20 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import org.androidaudioplugin.resident_midi_keyboard.keyboard.MidiKeyboardMain
+import dev.atsushieno.ktmidi.AndroidMidiAccess
+import org.androidaudioplugin.composeaudiocontrols.midi.KtMidiDeviceAccessScope
+import org.androidaudioplugin.composeaudiocontrols.midi.MidiKeyboardMain
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
+
+@Composable
+fun TitleBar(text: String) {
+    Text(
+        text, fontSize = 20.sp, color = MaterialTheme.colorScheme.inversePrimary,
+        modifier = Modifier
+            .padding(10.dp)
+    )
+}
 
 class MidiKeyboardForegroundService : LifecycleService(), SavedStateRegistryOwner {
     @Composable
@@ -68,28 +79,27 @@ class MidiKeyboardForegroundService : LifecycleService(), SavedStateRegistryOwne
         savedStateRegistryController.savedStateRegistry
     }
 
+    private val midiScope by lazy {
+        KtMidiDeviceAccessScope(AndroidMidiAccess(this))
+    }
     private lateinit var view: View
     private val compose: ComposeView by lazy {
         ComposeView(this).apply {
             setContent {
                 Column(Modifier.background(Color.White)) {
                     OverlayDraggableContainer {
-                        Row {
+                        Row(Modifier.fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.inverseSurface)
+                        ) {
                             TextButton(onClick = {
                                 windowManager.removeView(view)
                             }) {
-                                Text("[X]")
+                                TitleBar("[X]")
                             }
-                            Text(
-                                "ResidentMIDIKeyboard",
-                                fontSize = 20.sp,
-                                modifier = Modifier.border(3.dp, Color.Black)
-                                    .background(Color.White)
-                                    .width(IntrinsicSize.Max)
-                            )
+                            TitleBar("ResidentMIDIKeyboard")
                         }
                     }
-                    MidiKeyboardMain()
+                    midiScope.MidiKeyboardMain()
                 }
             }
         }
@@ -98,15 +108,12 @@ class MidiKeyboardForegroundService : LifecycleService(), SavedStateRegistryOwne
     override fun onCreate() {
         super.onCreate()
 
-        //view = MidiKeyboardSystemAlertView(this)
-        //val compose = ComposeView(this).apply { setContent { MidiKeyboardManagerMain() } }
         view = compose
         view.setViewTreeLifecycleOwner(this)
         view.setViewTreeSavedStateRegistryOwner(this)
-
-        savedStateRegistryController.performRestore(null)
-
-        //view.addView(compose)
+        // FIXME: I want to delay it to addOverlay() and make it state-savable, but it causes crash
+        //  ("Restarter must be created only during owner's initialization stage")
+        savedStateRegistryController.performRestore(stateBundle)
     }
 
     val INTENT_COMMAND_KEY = "Command"
@@ -124,6 +131,10 @@ class MidiKeyboardForegroundService : LifecycleService(), SavedStateRegistryOwne
         getSystemService(Context.WINDOW_SERVICE) as WindowManager
     }
 
+    private val stateBundle by lazy {
+        Bundle()
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
@@ -132,6 +143,7 @@ class MidiKeyboardForegroundService : LifecycleService(), SavedStateRegistryOwne
                 windowManager.addView(view, wmLayoutParams)
             }
             ACTION_ALERT_WINDOW_HIDE -> {
+                midiScope.cleanup()
                 windowManager.removeView(view)
             }
             ACTION_STOP -> {

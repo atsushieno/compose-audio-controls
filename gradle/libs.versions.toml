@@ -1,4 +1,5 @@
 [versions]
+compose-audio-controls = "0.2.0" # ourselves
 agp = "8.0.2"
 compose-markdown = "0.3.4"
 kotlin = "1.8.10"
@@ -15,6 +16,7 @@ dokka = "1.8.10"
 ktmidi_version = "0.5.0"
 appcompat = "1.6.1"
 lifecycle-service = "2.6.1"
+material = "1.9.0"
 
 [libraries]
 compose-markdown = { module = "com.github.jeziellago:compose-markdown", version.ref = "compose-markdown" }
@@ -37,12 +39,14 @@ material3 = { group = "androidx.compose.material3", name = "material3" }
 ktmidi = { group = "dev.atsushieno", name = "ktmidi", version.ref = "ktmidi_version" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycle-service" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 dokkaPlugin = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 metalavaPlugin = { id = "me.tylerbwong.gradle.metalava", version.ref = "metalava-gradle" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
 
 [bundles]
 

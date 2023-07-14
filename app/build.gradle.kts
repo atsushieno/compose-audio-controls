@@ -52,6 +52,7 @@ android {
 
 dependencies {
     implementation(project(":compose-audio-controls"))
+    implementation(project(":compose-audio-controls-midi"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
