@@ -14,6 +14,7 @@ import dev.atsushieno.ktmidi.UmpFactory
 import dev.atsushieno.ktmidi.toPlatformNativeBytes
 import org.androidaudioplugin.composeaudiocontrols.DiatonicKeyboardNoteExpressionOrigin
 import org.androidaudioplugin.composeaudiocontrols.DiatonicKeyboardWithControllers
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -52,16 +53,16 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
             onExpression = { dir, note, data ->
                 if (useMidi2Protocol) {
                     // MIDI 2.0 mode:
-                    // Per-Note Pitch Bend for horizontal moves
+                    // Pitch Bend for horizontal moves
                     if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {
-                        val v32 = (((data / 2.0) + 0.5) * 0xFFFFFFFF).roundToLong()
-                        val i64 = UmpFactory.midi2PerNotePitchBend(0, 0, note, v32)
+                        val v32 = min(0xFFFF_FFFFL, (((data + 1.0) / 2.0) * 0x1_0000_0000L).roundToLong())
+                        val i64 = UmpFactory.midi2PitchBend(0, 0, v32)
                         currentOutput?.send(Ump(i64).toPlatformNativeBytes(), 0, 8, 0)
                     }
-                    // MIDI 2.0 Expression CC for vertical moves
-                    if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {
-                        val v32 = (((data / 2.0) + 0.5) * 0xFFFFFFFF).roundToLong()
-                        val i64 = UmpFactory.midi2CC(0, 0, MidiCC.EXPRESSION, v32)
+                    // Per-Note Pitch Bend for vertical moves
+                    if (dir == DiatonicKeyboardNoteExpressionOrigin.VerticalDragging) {
+                        val v32 = min(0xFFFF_FFFFL, (((data + 1.0) / 2.0) * 0x1_0000_0000L).roundToLong())
+                        val i64 = UmpFactory.midi2PerNotePitchBend(0, 0, note, v32)
                         currentOutput?.send(Ump(i64).toPlatformNativeBytes(), 0, 8, 0)
                     }
                     // MIDI 2.0 PAf for pressure
@@ -76,14 +77,7 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
                     if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {
                         val dataIn7Bit = min(127, ((data * 64f).roundToInt() + 64)).toByte()
                         val bytes =
-                            byteArrayOf(MidiChannelStatus.CC.toByte(), MidiCC.EXPRESSION.toByte(), dataIn7Bit)
-                        currentOutput?.send(bytes, 0, bytes.size, 0)
-                    }
-                    // MIDI 1.0 Expression CC for vertical moves
-                    if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {
-                        val dataIn7Bit = min(127, ((data * 64f).roundToInt() + 64)).toByte()
-                        val bytes =
-                            byteArrayOf(MidiChannelStatus.PAF.toByte(), note.toByte(), dataIn7Bit)
+                            byteArrayOf(MidiChannelStatus.PITCH_BEND.toByte(), dataIn7Bit, 0)
                         currentOutput?.send(bytes, 0, bytes.size, 0)
                     }
                     // MIDI 1.0 PAf for pressure
