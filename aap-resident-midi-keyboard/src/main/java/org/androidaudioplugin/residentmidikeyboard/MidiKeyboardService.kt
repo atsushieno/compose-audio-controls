@@ -93,7 +93,7 @@ open class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
     private lateinit var view: View
 
 
-    fun createComposeView() = ComposeView(this).apply {
+    fun createOverlayComposeView() = ComposeView(this).apply {
         setViewTreeLifecycleOwner(this@MidiKeyboardService)
         setViewTreeSavedStateRegistryOwner(this@MidiKeyboardService)
 
@@ -118,10 +118,18 @@ open class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
         }
     }
 
+    fun createSurfaceComposeView() = ComposeView(this).apply {
+        setViewTreeLifecycleOwner(this@MidiKeyboardService)
+        setViewTreeSavedStateRegistryOwner(this@MidiKeyboardService)
+        setContent {
+            midiScope.MidiKeyboardMain()
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
 
-        view = createComposeView()
+        view = createOverlayComposeView()
         // FIXME: I want to delay it to addOverlay() and make it state-savable, but it causes crash
         //  ("Restarter must be created only during owner's initialization stage")
         savedStateRegistryController.performRestore(stateBundle)

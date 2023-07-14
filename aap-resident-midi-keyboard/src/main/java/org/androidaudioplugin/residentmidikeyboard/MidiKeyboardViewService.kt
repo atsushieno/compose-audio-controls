@@ -88,7 +88,7 @@ class MidiKeyboardViewService : MidiKeyboardService() {
                     viewHost = SurfaceControlViewHost(service, display, hostToken).apply {
 
 
-                        val view = service.createComposeView()
+                        val view = service.createSurfaceComposeView()
 
                         setView(view, width, height)
 
