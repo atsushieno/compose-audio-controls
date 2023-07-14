@@ -1,4 +1,4 @@
-package org.androidaudioplugin.resident_midi_keyboard
+package org.androidaudioplugin.residentmidikeyboard
 
 import android.content.Intent
 import android.os.Build
@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import dev.atsushieno.ktmidi.AndroidMidiAccess
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import org.androidaudioplugin.composeaudiocontrols.midi.MidiKeyboardMain
-import org.androidaudioplugin.resident_midi_keyboard.ui.theme.ComposeAudioControlsTheme
+import org.androidaudioplugin.residentmidikeyboard.ui.theme.ComposeAudioControlsTheme
 import kotlin.system.exitProcess
 
 
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
-        val serviceIntent = Intent(this, MidiKeyboardForegroundService::class.java)
+        val serviceIntent = Intent(this, MidiKeyboardService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent)
         } else {

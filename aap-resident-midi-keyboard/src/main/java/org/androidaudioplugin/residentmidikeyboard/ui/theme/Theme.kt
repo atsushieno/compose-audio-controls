@@ -1,4 +1,4 @@
-package org.androidaudioplugin.resident_midi_keyboard.ui.theme
+package org.androidaudioplugin.residentmidikeyboard.ui.theme
 
 import android.app.Activity
 import android.os.Build
