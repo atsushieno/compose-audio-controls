@@ -53,11 +53,8 @@ class MidiKeyboardSurfaceControlClient(private val context: Context) : AutoClose
         }
     })
 
-    private var surface = createSurfaceView()
-    val surfaceView: View
-        get() = surface
-
-    private fun createSurfaceView() = MidiKeyboardSurfaceView(context)
+    private val surface by lazy { MidiKeyboardSurfaceView(context) }
+    val surfaceView: View by lazy { surface }
 
     @WorkerThread
     @RequiresApi(Build.VERSION_CODES.R)

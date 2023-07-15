@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
@@ -90,7 +92,9 @@ open class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
     private val midiScope by lazy {
         KtMidiDeviceAccessScope(AndroidMidiAccess(this))
     }
-    private lateinit var view: View
+    private val view: View by lazy {
+        createOverlayComposeView()
+    }
 
 
     fun createOverlayComposeView() = ComposeView(this).apply {
@@ -101,7 +105,9 @@ open class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
             Column(Modifier.background(Color.White)) {
                 OverlayDraggableContainer {
                     Row(
-                        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.inverseSurface)
+                        Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.inverseSurface)
                     ) {
                         IconButton(onClick = { windowManager.removeView(view) }) {
                             Icon(
@@ -129,7 +135,6 @@ open class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
     override fun onCreate() {
         super.onCreate()
 
-        view = createOverlayComposeView()
         // FIXME: I want to delay it to addOverlay() and make it state-savable, but it causes crash
         //  ("Restarter must be created only during owner's initialization stage")
         savedStateRegistryController.performRestore(stateBundle)

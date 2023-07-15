@@ -1,13 +1,10 @@
 package org.androidaudioplugin.residentmidikeyboard
 
-import android.content.ComponentName
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
 import android.provider.Settings
-import android.view.SurfaceView
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -16,8 +13,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -60,7 +60,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MidiKeyboardManagerMain()
+                    Scaffold {
+                        title = "ResidentMIDIKeyboard"
+                        MidiKeyboardManagerMain(Modifier.padding(it))
+                    }
                 }
             }
             var lastBackPressed by remember { mutableStateOf(System.currentTimeMillis()) }
@@ -87,13 +90,13 @@ fun MidiKeyboardManagerMainPreview() {
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
-fun MidiKeyboardManagerMain() {
+fun MidiKeyboardManagerMain(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     if (!Settings.canDrawOverlays(context)) {
         Toast.makeText(context, "Overlay permission is not enabled.", Toast.LENGTH_LONG).show()
     }
 
-    Column {
+    Column(modifier.verticalScroll(rememberScrollState())) {
         MarkdownText(color = LocalContentColor.current,
             markdown = """
 There are three ways to use this MIDI keyboard:
@@ -114,18 +117,20 @@ There are three ways to use this MIDI keyboard:
         MarkdownText(color = LocalContentColor.current,
             markdown = """
 Below is an example use case for SurfaceView and SurfaceControlViewHost.
-
-FIXME: device selector does not drop down.
+Note that you will have to ensure that you allocate necessary space for expanded DropDownMenu e.g. by making container scrollable.
 """,
             modifier = Modifier.padding (20.dp))
         val surfaceControlClient by remember { mutableStateOf(MidiKeyboardSurfaceControlClient(context)) }
-        AndroidView(factory = {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                GlobalScope.launch {
-                    surfaceControlClient.connectUI(900, 900)
+            AndroidView(factory = {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    GlobalScope.launch {
+                        surfaceControlClient.connectUI(
+                            WindowManager.LayoutParams.WRAP_CONTENT,
+                            WindowManager.LayoutParams.WRAP_CONTENT
+                        )
+                    }
                 }
-            }
-            surfaceControlClient.surfaceView
-        })
+                surfaceControlClient.surfaceView
+            }, Modifier.size(800.dp, 600.dp))
     }
 }
