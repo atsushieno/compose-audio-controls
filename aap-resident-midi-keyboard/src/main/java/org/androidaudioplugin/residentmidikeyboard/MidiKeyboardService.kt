@@ -1,5 +1,6 @@
 package org.androidaudioplugin.residentmidikeyboard
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -10,10 +11,12 @@ import android.view.View
 import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,8 +26,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,14 +41,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistry
@@ -50,6 +63,7 @@ import dev.atsushieno.ktmidi.AndroidMidiAccess
 import org.androidaudioplugin.composeaudiocontrols.midi.KtMidiDeviceAccessScope
 import org.androidaudioplugin.composeaudiocontrols.midi.MidiKeyboardMain
 import org.androidaudioplugin.resident_midi_keyboard.R
+import org.androidaudioplugin.residentmidikeyboard.ui.theme.Typography
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
@@ -59,6 +73,29 @@ fun TitleBar(text: String) {
         text, fontSize = 20.sp, color = MaterialTheme.colorScheme.inversePrimary,
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(10.dp)
+    )
+}
+
+@Composable
+fun MidiKeyboardRemoteViewTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    // Dynamic color is available on Android 12+
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        darkTheme -> darkColorScheme()
+        else -> lightColorScheme()
+    }
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
     )
 }
 
@@ -102,24 +139,27 @@ open class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
         setViewTreeSavedStateRegistryOwner(this@MidiKeyboardService)
 
         setContent {
-            Column(Modifier.background(Color.White)) {
-                OverlayDraggableContainer {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.inverseSurface)
-                    ) {
-                        IconButton(onClick = { windowManager.removeView(view) }) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "close button",
-                                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                            )
+            MidiKeyboardRemoteViewTheme {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    Column {
+                        OverlayDraggableContainer {
+                            Row(
+                                Modifier.fillMaxWidth()
+                                    //.background(MaterialTheme.colorScheme.inverseSurface)
+                            ) {
+                                IconButton(onClick = { windowManager.removeView(view) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "close button",
+                                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                                    )
+                                }
+                                TitleBar("ResidentMIDIKeyboard")
+                            }
                         }
-                        TitleBar("ResidentMIDIKeyboard")
+                        midiScope.MidiKeyboardMain()
                     }
                 }
-                midiScope.MidiKeyboardMain()
             }
         }
     }
@@ -128,7 +168,11 @@ open class MidiKeyboardService : LifecycleService(), SavedStateRegistryOwner {
         setViewTreeLifecycleOwner(this@MidiKeyboardService)
         setViewTreeSavedStateRegistryOwner(this@MidiKeyboardService)
         setContent {
-            midiScope.MidiKeyboardMain()
+            MidiKeyboardRemoteViewTheme {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    midiScope.MidiKeyboardMain()
+                }
+            }
         }
     }
 

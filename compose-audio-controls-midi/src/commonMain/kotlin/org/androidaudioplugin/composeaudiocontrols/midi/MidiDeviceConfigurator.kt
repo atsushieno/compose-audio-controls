@@ -6,6 +6,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,13 +29,14 @@ fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
                 "(Select MIDI OUT)"
             else
                 midiOutDeviceList[selectedMidiDeviceIndex].name ?: "(unknown port)"
-        Button(onClick = { listExpanded = true }) { Text(currentText) }
+        Button(onClick = { listExpanded = true }) {
+            Text(currentText, color = LocalContentColor.current) }
         DropdownMenu(
             modifier = modifier,
             expanded = listExpanded,
             onDismissRequest = { listExpanded = false }) {
             midiOutDeviceList.forEachIndexed { index, device ->
-                DropdownMenuItem(text = { Text(device.name ?: "(unknown port)") }, onClick = {
+                DropdownMenuItem(text = { Text(device.name ?: "(unknown port)", color = LocalContentColor.current) }, onClick = {
                     onSelectionChange(index)
                     listExpanded = false
                 })
@@ -60,6 +62,6 @@ fun MidiDeviceAccessScope.MidiDeviceConfigurator() {
             useUMP = !useUMP
             onMidiProtocolChange(useUMP)
         })
-        Text("Use MIDI 2.0", modifier = Modifier.align(Alignment.CenterVertically))
+        Text("MIDI2", color = LocalContentColor.current, modifier = Modifier.align(Alignment.CenterVertically))
     }
 }
