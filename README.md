@@ -105,6 +105,12 @@ dependencies {
 
 The API reference is published at https://atsushieno.github.io/compose-audio-controls/ (updated for every new release tagging)
 
+## Showcases
+
+[Resident MIDI Keyboard](https://github.com/atsushieno/resident-midi-keyboard) is a straightforward usage example of `DianoticKeyboardWithControllers`. (It used to be part of this project, but now has its own home.)
+
+[AAP (Audio Plugins For Android)](https://github.com/atsushieno/aap-core) makes use of the keyboard and knob as part of the default native (Compose) UI.
+
 ## License
 
 compose-audio-controls is released under the MIT license.
