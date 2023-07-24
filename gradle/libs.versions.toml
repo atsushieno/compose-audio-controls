@@ -1,5 +1,5 @@
 [versions]
-compose-audio-controls = "0.2.0" # ourselves
+compose-audio-controls = "0.3.0" # ourselves
 agp = "8.0.2"
 compose-markdown = "0.3.4"
 kotlin = "1.8.10"

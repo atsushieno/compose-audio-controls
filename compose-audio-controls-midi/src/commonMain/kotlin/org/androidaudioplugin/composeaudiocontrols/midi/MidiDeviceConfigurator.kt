@@ -35,6 +35,10 @@ fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
             modifier = modifier,
             expanded = listExpanded,
             onDismissRequest = { listExpanded = false }) {
+            DropdownMenuItem(text = { Text("(Close Output)", color = LocalContentColor.current) }, onClick = {
+                onSelectionChange(-1)
+                listExpanded = false
+            })
             midiOutDeviceList.forEachIndexed { index, device ->
                 DropdownMenuItem(text = { Text(device.name ?: "(unknown port)", color = LocalContentColor.current) }, onClick = {
                     onSelectionChange(index)

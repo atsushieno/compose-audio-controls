@@ -11,21 +11,33 @@ import kotlinx.coroutines.launch
 
 interface MidiDeviceAccessScope {
     val outputs: List<MidiPortDetails>
-    val currentOutput: MidiOutput?
+    val send: MidiEventSender
     val useMidi2Protocol: Boolean
     fun onSelectionChange(index: Int)
     fun onMidiProtocolChange(useMidi2: Boolean)
     fun cleanup()
 }
 
-class KtMidiDeviceAccessScope(val access: MidiAccess) : MidiDeviceAccessScope {
-    private var output: MidiOutput? = null
+class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatchers: Boolean = false) : MidiDeviceAccessScope {
+    private var openedOutput: MidiOutput? = null
     private var midi2 = false
 
     override val outputs: List<MidiPortDetails>
         get() = access.outputs.toList()
-    override val currentOutput: MidiOutput?
-        get() = output
+    override val send: MidiEventSender
+        get() = { mevent, offset, length, timestampInNanoseconds ->
+            if (openedOutput != null) {
+                try {
+                    openedOutput?.send(mevent, offset, length, timestampInNanoseconds)
+                } catch(ex: Exception) {
+                    // FIXME: we should have some logging functionality (needs to be x-plat)
+                    println(ex)
+                    cleanup()
+                }
+            }
+            if (openedOutput == null || alwaysSendToDispatchers)
+                MidiKeyboardInputDispatcher.senders.forEach { it(mevent, offset, length, timestampInNanoseconds) }
+        }
 
     override val useMidi2Protocol: Boolean
         get() = midi2
@@ -33,9 +45,10 @@ class KtMidiDeviceAccessScope(val access: MidiAccess) : MidiDeviceAccessScope {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onSelectionChange(index: Int) {
         GlobalScope.launch {
-            output?.close()
-            output = access.openOutput(outputs[index].id)
-            println("Opened Midi Output: ${outputs[index].name}")
+            cleanup()
+            if (index < 0)
+                return@launch
+            openedOutput = access.openOutput(outputs[index].id)
         }
     }
 
@@ -45,11 +58,17 @@ class KtMidiDeviceAccessScope(val access: MidiAccess) : MidiDeviceAccessScope {
 
     override fun onMidiProtocolChange (useMidi2: Boolean) {
         val bytes = midi2EndpointConfiguration(if (useMidi2) 2 else 1)
-        output?.send(bytes, 0, bytes.size, 0)
+        send(bytes, 0, bytes.size, 0)
         midi2 = useMidi2
     }
 
     override fun cleanup() {
-        output?.close()
+        try {
+            openedOutput?.close()
+        } catch(ex: Exception) {
+            // FIXME: we should have some logging functionality (needs to be x-plat)
+            println(ex)
+        }
+        openedOutput = null
     }
 }
