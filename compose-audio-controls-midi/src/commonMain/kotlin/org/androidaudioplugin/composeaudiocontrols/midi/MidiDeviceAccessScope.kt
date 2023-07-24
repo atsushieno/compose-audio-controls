@@ -18,7 +18,7 @@ interface MidiDeviceAccessScope {
     fun cleanup()
 }
 
-class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatchers: Boolean = false) : MidiDeviceAccessScope {
+class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatchers: Boolean = true) : MidiDeviceAccessScope {
     private var openedOutput: MidiOutput? = null
     private var midi2 = false
 
