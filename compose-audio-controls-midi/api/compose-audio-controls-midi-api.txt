@@ -4,6 +4,35 @@ package org.androidaudioplugin.composeaudiocontrols.midi {
     method @androidx.compose.runtime.Composable public static void DiatonicLiveMidiKeyboard(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope);
   }
 
+  public final class Enumeration {
+    ctor public Enumeration(@NonNull String label, int status, @NonNull kotlin.ranges.IntRange range1, optional @NonNull kotlin.ranges.IntRange range2, optional @NonNull kotlin.ranges.IntRange range3, optional @NonNull String prefix1, optional @NonNull String prefix2, optional @NonNull String prefix3);
+    method @NonNull public String component1();
+    method public int component2();
+    method @NonNull public kotlin.ranges.IntRange component3();
+    method @NonNull public kotlin.ranges.IntRange component4();
+    method @NonNull public kotlin.ranges.IntRange component5();
+    method @NonNull public String component6();
+    method @NonNull public String component7();
+    method @NonNull public String component8();
+    method @NonNull public org.androidaudioplugin.composeaudiocontrols.midi.Enumeration copy(@NonNull String label, int status, @NonNull kotlin.ranges.IntRange range1, @NonNull kotlin.ranges.IntRange range2, @NonNull kotlin.ranges.IntRange range3, @NonNull String prefix1, @NonNull String prefix2, @NonNull String prefix3);
+    method @NonNull public String getLabel();
+    method @NonNull public String getPrefix1();
+    method @NonNull public String getPrefix2();
+    method @NonNull public String getPrefix3();
+    method @NonNull public kotlin.ranges.IntRange getRange1();
+    method @NonNull public kotlin.ranges.IntRange getRange2();
+    method @NonNull public kotlin.ranges.IntRange getRange3();
+    method public int getStatus();
+    property @NonNull public final String label;
+    property @NonNull public final String prefix1;
+    property @NonNull public final String prefix2;
+    property @NonNull public final String prefix3;
+    property @NonNull public final kotlin.ranges.IntRange range1;
+    property @NonNull public final kotlin.ranges.IntRange range2;
+    property @NonNull public final kotlin.ranges.IntRange range3;
+    property public final int status;
+  }
+
   public final class KtMidiDeviceAccessScope implements org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope {
     ctor public KtMidiDeviceAccessScope(@NonNull dev.atsushieno.ktmidi.MidiAccess access, optional boolean alwaysSendToDispatchers);
     method public void cleanup();
@@ -48,8 +77,23 @@ package org.androidaudioplugin.composeaudiocontrols.midi {
   }
 
   public final class MidiKeyboardMainKt {
-    method @androidx.compose.runtime.Composable public static void MidiKeyboardMain(@NonNull dev.atsushieno.ktmidi.MidiAccess access);
-    method @androidx.compose.runtime.Composable public static void MidiKeyboardMain(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope);
+    method @Deprecated @androidx.compose.runtime.Composable public static void MidiKeyboardMain(@NonNull dev.atsushieno.ktmidi.MidiAccess access);
+    method @androidx.compose.runtime.Composable public static void MidiKeyboardMain(@NonNull dev.atsushieno.ktmidi.MidiAccess access, optional @Nullable androidx.compose.ui.graphics.ImageBitmap showControllerComboWithBitmap);
+    method @Deprecated @androidx.compose.runtime.Composable public static void MidiKeyboardMain(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope);
+    method @androidx.compose.runtime.Composable public static void MidiKeyboardMain(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope, optional @Nullable androidx.compose.ui.graphics.ImageBitmap showControllerComboWithBitmap);
+  }
+
+  public final class MidiKnobControllerComboKt {
+    method @androidx.compose.runtime.Composable public static void ControlTargetSelector(optional @NonNull androidx.compose.ui.Modifier modifier, int index, optional @NonNull java.util.List<org.androidaudioplugin.composeaudiocontrols.midi.Enumeration> controlTargets, optional @NonNull kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> onSelectionChange);
+    method @androidx.compose.runtime.Composable public static void MidiKnobControllerCombo(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope, @NonNull androidx.compose.ui.graphics.ImageBitmap knobBitmap);
+    method @NonNull public static java.util.List<org.androidaudioplugin.composeaudiocontrols.midi.Enumeration> getControlTargetCatalog();
+    method @NonNull public static kotlin.ranges.IntRange getMidi1Range();
+    property @NonNull public static final java.util.List<org.androidaudioplugin.composeaudiocontrols.midi.Enumeration> controlTargetCatalog;
+    property @NonNull public static final kotlin.ranges.IntRange midi1Range;
+  }
+
+  public final class MidiKnobControllerCombo_androidKt {
+    method @androidx.compose.runtime.Composable public static void MidiKnobControllerCombo(@NonNull org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope, @DrawableRes int drawableResId);
   }
 
 }
