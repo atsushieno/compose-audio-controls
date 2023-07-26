@@ -39,18 +39,20 @@ import org.androidaudioplugin.composeaudiocontrols.DefaultKnobTooltip
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
 
 val midi1Range = 0..127
-data class Enumeration(val label: String, val status: Int, val range1: IntRange, val range2: IntRange = IntRange.EMPTY, val range3: IntRange = IntRange.EMPTY)
+data class Enumeration(val label: String, val status: Int,
+                       val range1: IntRange, val range2: IntRange = IntRange.EMPTY, val range3: IntRange = IntRange.EMPTY,
+                       val prefix1: String = "", val prefix2: String = "", val prefix3: String = "")
 val controlTargetCatalog = listOf(
     Enumeration("CC", MidiChannelStatus.CC, midi1Range, midi1Range),
     Enumeration("CAf", MidiChannelStatus.CAF, midi1Range),
-    Enumeration("PAf", MidiChannelStatus.PAF, midi1Range, 0..127),
+    Enumeration("PAf", MidiChannelStatus.PAF, midi1Range, 0..127, prefix1 = "key:"),
     Enumeration("PitchBend", MidiChannelStatus.PITCH_BEND, -0x2000 .. 0x1FFF),
-    Enumeration("PN-PB", MidiChannelStatus.PER_NOTE_PITCH_BEND, midi1Range, -0x2000 .. 0x1FFF),
-    Enumeration("RPN", MidiChannelStatus.RPN, midi1Range, midi1Range, midi1Range),
-    Enumeration("NRPN", MidiChannelStatus.NRPN, midi1Range, midi1Range, midi1Range),
-    Enumeration("PN-RCC", MidiChannelStatus.PER_NOTE_RCC, midi1Range, midi1Range, midi1Range),
-    Enumeration("PN-ACC", MidiChannelStatus.PER_NOTE_ACC, midi1Range, midi1Range, midi1Range),
-    Enumeration("Program", MidiChannelStatus.PROGRAM, midi1Range, midi1Range, midi1Range),
+    Enumeration("PN-PB", MidiChannelStatus.PER_NOTE_PITCH_BEND, midi1Range, -0x2000 .. 0x1FFF, prefix1 = "key:"),
+    Enumeration("RPN", MidiChannelStatus.RPN, midi1Range, midi1Range, midi1Range, "M:", "L:", "D:"),
+    Enumeration("NRPN", MidiChannelStatus.NRPN, midi1Range, midi1Range, midi1Range, "M:", "L:", "D:"),
+    Enumeration("PN-RCC", MidiChannelStatus.PER_NOTE_RCC, midi1Range, midi1Range, midi1Range, "key:"),
+    Enumeration("PN-ACC", MidiChannelStatus.PER_NOTE_ACC, midi1Range, midi1Range, midi1Range, "key:"),
+    Enumeration("Program", MidiChannelStatus.PROGRAM, midi1Range, midi1Range, midi1Range, "p:", "BkM:", "BkL:"),
 )
 
 
@@ -204,7 +206,7 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
             tooltip = {
                 DefaultKnobTooltip(showTooltip = true, value = control1, valueText = when(target) {
                     0 -> WellKnownNames.ccNames[127.coerceAtMost(knobValue.toInt())] ?: "(N/A)"
-                    else -> control1.toInt().toString()
+                    else -> controlTargetCatalog[target].prefix1 + control1.toInt().toString()
                 })
             },
             onValueChange = {
@@ -218,7 +220,8 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                 modifier = Modifier.padding(knobPadding, 0.dp),
                 value = control2,
                 valueRange = range2.first.toFloat()..range2.last.toFloat(),
-                tooltip = { DefaultKnobTooltip(showTooltip = true, value = control2, valueText = control2.toInt().toString()) },
+                tooltip = { DefaultKnobTooltip(showTooltip = true, value = control2,
+                    valueText = controlTargetCatalog[target].prefix2 + control2.toInt().toString()) },
                 onValueChange = {
                     control2 = it
                     if (discrete)
@@ -231,7 +234,8 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                 modifier = Modifier.padding(knobPadding, 0.dp),
                 value = control3,
                 valueRange = range3.first.toFloat()..range3.last.toFloat(),
-                tooltip = { DefaultKnobTooltip(showTooltip = true, value = control3, valueText = control3.toInt().toString()) },
+                tooltip = { DefaultKnobTooltip(showTooltip = true, value = control3,
+                    valueText = controlTargetCatalog[target].prefix3 + control3.toInt().toString()) },
                 onValueChange = {
                     control3 = it
                     if (discrete)
