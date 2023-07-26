@@ -194,10 +194,19 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
                     }
                     .size(sizePx.toDp())
             )
-            ImageStripKnobScopeData(value, isBeingDragged).tooltip()
+            Box(Modifier.align(Alignment.CenterHorizontally)) {
+                ImageStripKnobScopeData(value, isBeingDragged).tooltip()
+            }
         }
     }
 }
+
+@Deprecated("Use newer DefaultKnobTooltip() overload that takes valueText",
+    ReplaceWith("DefaultKnobTooltip(modifier, showTooltip, value, textColor, null)")
+)
+@Composable
+fun DefaultKnobTooltip(modifier: Modifier = Modifier, showTooltip: Boolean, value: Float, textColor: Color = Color.Gray) =
+    DefaultKnobTooltip(modifier, showTooltip, value, textColor, null)
 
 /**
  * The default tooltip `Composable` implementation for `ImageStripKnob`.
@@ -207,20 +216,21 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
  * @param showTooltip   The flag to indicate whether the label is shown or not. By default, it is true only if the user is dragging the knob.
  * @param value         The float value to render as the label.
  * @param textColor     a `Color` value to specify at `Text` label.
+ * @param valueText     an optional text string that could be used instead of the formatted number. Useful for enumerations.
  */
 @Composable
-fun DefaultKnobTooltip(modifier: Modifier = Modifier, showTooltip: Boolean, value: Float, textColor: Color = Color.Gray) {
+fun DefaultKnobTooltip(modifier: Modifier = Modifier, showTooltip: Boolean, value: Float, textColor: Color = Color.Gray, valueText: String? = null) {
     if (showTooltip)
-        Text(
-            formatLabelNumber(value),
-            fontSize = 12.sp,
-            color = textColor,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.offset(8.dp, 0.dp).then(modifier)
-        )
+        Box(modifier) {
+            Text(
+                valueText ?: formatLabelNumber(value),
+                fontSize = 12.sp,
+                color = textColor
+            )
+        }
     else
         with(LocalDensity.current) {
-            Box(Modifier.height(16.sp.toDp()))
+            Box(Modifier.height(16.sp.toDp()).then(modifier))
         }
 }
 
