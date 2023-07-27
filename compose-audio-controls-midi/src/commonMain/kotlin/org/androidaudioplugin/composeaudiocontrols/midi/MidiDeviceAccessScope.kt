@@ -48,7 +48,12 @@ class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatcher
             cleanup()
             if (index < 0)
                 return@launch
-            openedOutput = access.openOutput(outputs[index].id)
+            try {
+                openedOutput = access.openOutput(outputs[index].id)
+            } catch(ex: Exception) {
+                // FIXME: we should have some logging functionality (needs to be x-plat)
+                println(ex)
+            }
         }
     }
 
