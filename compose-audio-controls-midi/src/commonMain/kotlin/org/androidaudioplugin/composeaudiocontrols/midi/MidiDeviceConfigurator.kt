@@ -16,6 +16,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import dev.atsushieno.ktmidi.MidiPortDetails
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
@@ -49,6 +55,7 @@ fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun MidiDeviceAccessScope.MidiDeviceConfigurator() {
     Row {
@@ -61,10 +68,16 @@ fun MidiDeviceAccessScope.MidiDeviceConfigurator() {
                 onSelectionChange(it)
             })
 
+        var umpSwitchBusy by remember { mutableStateOf(false) }
         var useUMP by remember { mutableStateOf(false) }
-        Checkbox(checked = useUMP, onCheckedChange = {
+        Checkbox(enabled = !umpSwitchBusy, checked = useUMP, onCheckedChange = {
+            umpSwitchBusy = true
             useUMP = !useUMP
             onMidiProtocolChange(useUMP)
+            GlobalScope.launch {
+                delay(500)
+                umpSwitchBusy = false
+            }
         })
         Text("MIDI2", color = LocalContentColor.current, modifier = Modifier.align(Alignment.CenterVertically))
     }
