@@ -25,9 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.text.PlatformParagraphStyle
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import dev.atsushieno.ktmidi.MidiCC
 import dev.atsushieno.ktmidi.MidiChannelStatus
@@ -39,27 +36,50 @@ import org.androidaudioplugin.composeaudiocontrols.DefaultKnobTooltip
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
 
 val midi1Range = 0..127
-data class Enumeration(val label: String, val status: Int,
-                       val range1: IntRange, val range2: IntRange = IntRange.EMPTY, val range3: IntRange = IntRange.EMPTY,
-                       val prefix1: String = "", val prefix2: String = "", val prefix3: String = "")
+
+data class ControlSettings(val prefix: String = "", val sendEvent: Boolean = true, val range: IntRange = IntRange.EMPTY)
+val midi1Control = ControlSettings(range = midi1Range)
+val noteControl = ControlSettings("key:", false, midi1Range)
+val noControl = ControlSettings("", false)
+
+data class ControlTargetDefinition(val label: String, val status: Int,
+                                   val control1: ControlSettings,
+                                   val control2: ControlSettings = noControl,
+                                   val control3: ControlSettings = noControl)
+
 val controlTargetCatalog = listOf(
-    Enumeration("CC", MidiChannelStatus.CC, midi1Range, midi1Range),
-    Enumeration("CAf", MidiChannelStatus.CAF, midi1Range),
-    Enumeration("PAf", MidiChannelStatus.PAF, midi1Range, 0..127, prefix1 = "key:"),
-    Enumeration("PitchBend", MidiChannelStatus.PITCH_BEND, -0x2000 .. 0x1FFF),
-    Enumeration("PN-PB", MidiChannelStatus.PER_NOTE_PITCH_BEND, midi1Range, -0x2000 .. 0x1FFF, prefix1 = "key:"),
-    Enumeration("RPN", MidiChannelStatus.RPN, midi1Range, midi1Range, midi1Range, "M:", "L:", "D:"),
-    Enumeration("NRPN", MidiChannelStatus.NRPN, midi1Range, midi1Range, midi1Range, "M:", "L:", "D:"),
-    Enumeration("PN-RCC", MidiChannelStatus.PER_NOTE_RCC, midi1Range, midi1Range, midi1Range, "key:"),
-    Enumeration("PN-ACC", MidiChannelStatus.PER_NOTE_ACC, midi1Range, midi1Range, midi1Range, "key:"),
-    Enumeration("Program", MidiChannelStatus.PROGRAM, midi1Range, midi1Range, midi1Range, "p:", "BkM:", "BkL:"),
+    ControlTargetDefinition("CC", MidiChannelStatus.CC,
+        ControlSettings(sendEvent = false, range = midi1Range),
+        midi1Control),
+    ControlTargetDefinition("CAf", MidiChannelStatus.CAF, midi1Control),
+    ControlTargetDefinition("PAf", MidiChannelStatus.PAF, noteControl, midi1Control),
+    ControlTargetDefinition("PitchBend", MidiChannelStatus.PITCH_BEND, ControlSettings(range = -0x2000 .. 0x1FFF)),
+    ControlTargetDefinition("PN-PB", MidiChannelStatus.PER_NOTE_PITCH_BEND, noteControl, ControlSettings(range = -0x2000 .. 0x1FFF)),
+    ControlTargetDefinition("RPN", MidiChannelStatus.RPN,
+        ControlSettings("M:", false, midi1Range),
+        ControlSettings("L:", false, midi1Range),
+        ControlSettings("D:", range = midi1Range)),
+    ControlTargetDefinition("NRPN", MidiChannelStatus.NRPN,
+        ControlSettings("M:", false, midi1Range),
+        ControlSettings("L:", false, midi1Range),
+        ControlSettings("D:", range = midi1Range)),
+    ControlTargetDefinition("PN-RCC", MidiChannelStatus.PER_NOTE_RCC, noteControl,
+        ControlSettings("idx:", false, midi1Range),
+        midi1Control),
+    ControlTargetDefinition("PN-ACC", MidiChannelStatus.PER_NOTE_ACC, noteControl,
+        ControlSettings("idx:", false, midi1Range),
+        midi1Control),
+    ControlTargetDefinition("Program", MidiChannelStatus.PROGRAM,
+        ControlSettings("P:", range = midi1Range),
+        ControlSettings("BkM:", range = midi1Range),
+        ControlSettings("BkL:", range = midi1Range))
 )
 
 
 @Composable
 fun ControlTargetSelector(modifier: Modifier = Modifier,
                           index: Int,
-                          controlTargets: List<Enumeration> = controlTargetCatalog,
+                          controlTargets: List<ControlTargetDefinition> = controlTargetCatalog,
                           onSelectionChange: (Int) -> Unit = { _ -> }) {
     Column(modifier) {
         var listExpanded by remember { mutableStateOf(false) }
@@ -185,19 +205,181 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
 
 private val knobPadding = 6.dp
 
+// Can we split this function to small pieces? those remembered states make it impossible...
 @Composable
 fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
     Row {
+        var targetChanged by remember { mutableStateOf(false) }
         var target by remember { mutableStateOf(0) }
-        ControlTargetSelector(index = target, onSelectionChange = { target = it })
+        ControlTargetSelector(index = target, onSelectionChange = {
+            target = it
+            targetChanged = true
+        })
+
+        // Those remembered values help storing and restoring the control values with MidiMachine or Midi2Machine.
+        // along with `updateValueState()` lambda (defined later).
+        var lastCCIndex by remember { mutableStateOf(0) }
+        var lastPAFNote by remember { mutableStateOf(0x40) }
+        var lastPNPBNote by remember { mutableStateOf(0x40) }
+        var lastRPN by remember { mutableStateOf(0) }
+        var lastNRPN by remember { mutableStateOf(0) }
+        var lastPNRCCNote by remember { mutableStateOf(0x40) }
+        var lastPNRCCIndex by remember { mutableStateOf(0) }
+        var lastPNACCNote by remember { mutableStateOf(0x40) }
+        var lastPNACCIndex by remember { mutableStateOf(0) }
+        var lastBank by remember { mutableStateOf(0) }
 
         var control1 by remember { mutableStateOf(0.0f) }
-        val range1 = controlTargetCatalog[target].range1
+        val range1 = controlTargetCatalog[target].control1.range
         var control2 by remember { mutableStateOf(0.0f) }
-        val range2 = controlTargetCatalog[target].range2
+        val range2 = controlTargetCatalog[target].control2.range
         var control3 by remember { mutableStateOf(0.0f) }
-        val range3 = controlTargetCatalog[target].range3
+        val range3 = controlTargetCatalog[target].control3.range
         var discrete by remember { mutableStateOf(true) }
+
+        if (targetChanged) {
+            val targetDef = controlTargetCatalog[target]
+            if (useMidi2Protocol) {
+                val reg = midi2Machine.channel(0)
+                when (targetDef.status) {
+                    MidiChannelStatus.CC -> {
+                        control1 = lastCCIndex.toFloat()
+                        control2 = (reg.controls[control1.toInt()] shr 25).toFloat()
+                    }
+                    MidiChannelStatus.CAF -> {
+                        control1 = (reg.caf shr 25).toFloat()
+                        control2 = 0f
+                        control3 = 0f
+                    }
+                    MidiChannelStatus.PAF -> {
+                        control1 = lastPAFNote.toFloat()
+                        control2 = (reg.pafVelocity[lastPAFNote] shr 25).toFloat()
+                        control3 = 0f
+                    }
+                    MidiChannelStatus.PITCH_BEND -> {
+                        control1 = ((reg.pitchbend shr 18) - 0x2000u).toFloat()
+                        control2 = 0f
+                        control3 = 0f
+                    }
+                    MidiChannelStatus.PER_NOTE_PITCH_BEND -> {
+                        control1 = lastPNPBNote.toFloat()
+                        control2 = ((reg.perNotePitchbend[lastPNPBNote] shr 18) - 0x2000u).toFloat()
+                        control3 = 0f
+                    }
+                    MidiChannelStatus.RPN -> {
+                        control1 = (lastRPN / 0x80).toFloat()
+                        control2 = (lastRPN % 0x80).toFloat()
+                        control3 = (reg.rpns[lastRPN] shr 25).toFloat()
+                    }
+                    MidiChannelStatus.NRPN -> {
+                        control1 = (lastNRPN / 0x80).toFloat()
+                        control2 = (lastNRPN % 0x80).toFloat()
+                        control3 = (reg.nrpns[lastNRPN] shr 25).toFloat()
+                    }
+                    MidiChannelStatus.PER_NOTE_RCC -> {
+                        control1 = lastPNRCCNote.toFloat()
+                        control2 = lastPNRCCIndex.toFloat()
+                        control3 = (reg.perNoteRCC[lastPNRCCNote][lastPNRCCIndex] shr 25).toFloat()
+                    }
+                    MidiChannelStatus.PER_NOTE_ACC -> {
+                        control1 = lastPNACCNote.toFloat()
+                        control2 = lastPNACCIndex.toFloat()
+                        control3 = (reg.perNoteACC[lastPNACCNote][lastPNACCIndex] shr 25).toFloat()
+                    }
+                    MidiChannelStatus.PROGRAM -> {
+                        control1 = midi1Machine.channels[0].program.toFloat()
+                        control2 = (lastBank / 0x80).toFloat()
+                        control3 = (lastBank % 0x80).toFloat()
+                    }
+                }
+            } else {
+                when (targetDef.status) {
+                    MidiChannelStatus.CC -> {
+                        control1 = lastCCIndex.toFloat()
+                        control2 = midi1Machine.channels[0].controls[control1.toInt()].toFloat()
+                    }
+                    MidiChannelStatus.CAF -> {
+                        control1 = midi1Machine.channels[0].caf.toFloat()
+                        control2 = 0f
+                        control3 = 0f
+                    }
+                    MidiChannelStatus.PAF -> {
+                        control1 = lastPAFNote.toFloat()
+                        control2 = midi1Machine.channels[0].pafVelocity[lastPAFNote].toFloat()
+                        control3 = 0f
+                    }
+                    MidiChannelStatus.PITCH_BEND -> {
+                        control1 = (midi1Machine.channels[0].pitchbend - 0x2000).toFloat()
+                        control2 = 0f
+                        control3 = 0f
+                    }
+                    MidiChannelStatus.PER_NOTE_PITCH_BEND -> {
+                        control1 = lastPNPBNote.toFloat()
+                        control2 = (midi1Machine.channels[0].pitchbend - 0x2000).toFloat()
+                        control3 = 0f
+                    }
+                    MidiChannelStatus.RPN -> {
+                        // The control3 value will not make sense without sending CC for RPN MSB/LSB,
+                        // but they will be sent at send() consistently.
+                        control1 = (lastRPN / 0x80).toFloat()
+                        control2 = (lastRPN % 0x80).toFloat()
+                        control3 = midi1Machine.channels[0].controls[MidiCC.DTE_MSB].toFloat()
+                    }
+                    MidiChannelStatus.NRPN -> {
+                        // The control3 value will not make sense without sending CC for RPN MSB/LSB,
+                        // but they will be sent at send() consistently.
+                        control1 = (lastNRPN / 0x80).toFloat()
+                        control2 = (lastNRPN % 0x80).toFloat()
+                        control3 = midi1Machine.channels[0].controls[MidiCC.DTE_MSB].toFloat()
+                    }
+                    MidiChannelStatus.PER_NOTE_RCC -> {} // N/A
+                    MidiChannelStatus.PER_NOTE_ACC -> {} // N/A
+                    MidiChannelStatus.PROGRAM -> {
+                        control1 = midi1Machine.channels[0].program.toFloat()
+                        control2 = (lastBank / 0x80).toFloat()
+                        control3 = (lastBank % 0x80).toFloat()
+                    }
+                }
+            }
+            targetChanged = false
+        }
+
+        // update internal states before sending the actual value change
+        // (or just update the internal states if it is not discrete).
+        val updateValueState by remember { mutableStateOf({ status: Int, v1: Int, v2: Int, v3: Int ->
+            // FIXME: maybe we could just keep midi2 impl.?
+            if (useMidi2Protocol) {
+                when (controlTargetCatalog[target].status) {
+                    MidiChannelStatus.CC -> lastCCIndex = v1
+                    MidiChannelStatus.PAF -> lastPAFNote = v1
+                    MidiChannelStatus.PER_NOTE_PITCH_BEND -> lastPNPBNote = v1
+                    MidiChannelStatus.PER_NOTE_RCC -> {
+                        lastPNRCCNote = v1
+                        lastPNRCCIndex = v2
+                    }
+                    MidiChannelStatus.PER_NOTE_ACC -> {
+                        lastPNACCNote = v1
+                        lastPNACCIndex = v2
+                    }
+                    MidiChannelStatus.RPN -> lastRPN = v1 * 0x80 + v2
+                    MidiChannelStatus.NRPN -> lastNRPN = v1 * 0x80 + v2
+                    MidiChannelStatus.PROGRAM -> { lastBank = v2 * 0x80 + v3 }
+                }
+            } else {
+                when (controlTargetCatalog[target].status) {
+                    MidiChannelStatus.CC -> lastCCIndex = v1
+                    MidiChannelStatus.PAF -> lastPAFNote = v1
+                    MidiChannelStatus.PER_NOTE_PITCH_BEND,
+                    MidiChannelStatus.PER_NOTE_RCC,
+                    MidiChannelStatus.PER_NOTE_ACC -> {} // not supported
+                    MidiChannelStatus.RPN -> lastRPN = v1 * 0x80 + v2
+                    MidiChannelStatus.NRPN -> lastNRPN = v1 * 0x80 + v2
+                    MidiChannelStatus.PROGRAM -> lastBank = v2 * 0x80 + v3
+                }
+            }
+            if (discrete)
+                sendValueChange(status, v1, v2, v3)
+        })}
 
         ImageStripKnob(imageBitmap = knobBitmap,
             modifier = Modifier.padding(knobPadding, 0.dp),
@@ -206,13 +388,12 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
             tooltip = {
                 DefaultKnobTooltip(showTooltip = true, value = control1, valueText = when(target) {
                     0 -> WellKnownNames.ccNames[127.coerceAtMost(knobValue.toInt())] ?: "(N/A)"
-                    else -> controlTargetCatalog[target].prefix1 + control1.toInt().toString()
+                    else -> controlTargetCatalog[target].control1.prefix + control1.toInt().toString()
                 })
             },
             onValueChange = {
                 control1 = it
-                if (discrete)
-                    sendValueChange(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
+                updateValueState(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
             })
 
         if (range2 != IntRange.EMPTY) {
@@ -221,33 +402,30 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                 value = control2,
                 valueRange = range2.first.toFloat()..range2.last.toFloat(),
                 tooltip = { DefaultKnobTooltip(showTooltip = true, value = control2,
-                    valueText = controlTargetCatalog[target].prefix2 + control2.toInt().toString()) },
+                    valueText = controlTargetCatalog[target].control2.prefix + control2.toInt().toString()) },
                 onValueChange = {
                     control2 = it
-                    if (discrete)
-                        sendValueChange(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
+                    updateValueState(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
                 })
         }
 
-        if (controlTargetCatalog[target].range3 != IntRange.EMPTY) {
+        if (controlTargetCatalog[target].control3.range != IntRange.EMPTY) {
             ImageStripKnob(imageBitmap = knobBitmap,
                 modifier = Modifier.padding(knobPadding, 0.dp),
                 value = control3,
                 valueRange = range3.first.toFloat()..range3.last.toFloat(),
                 tooltip = { DefaultKnobTooltip(showTooltip = true, value = control3,
-                    valueText = controlTargetCatalog[target].prefix3 + control3.toInt().toString()) },
+                    valueText = controlTargetCatalog[target].control3.prefix + control3.toInt().toString()) },
                 onValueChange = {
                     control3 = it
-                    if (discrete)
-                        sendValueChange(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
+                    updateValueState(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
                 })
         }
 
         Box(Modifier.align(Alignment.CenterVertically).background(Color.White).padding(knobPadding, 0.dp)
             .clickable {
                 discrete = !discrete
-                if (discrete)
-                    sendValueChange(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
+                updateValueState(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
             }) {
             Image(imageVector = if (discrete) Icons.Default.CheckCircle else Icons.Default.Close,
                 "send", Modifier.size(32.dp))

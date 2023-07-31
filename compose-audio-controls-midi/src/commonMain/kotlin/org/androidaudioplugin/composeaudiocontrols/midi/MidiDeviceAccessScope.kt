@@ -1,9 +1,14 @@
 package org.androidaudioplugin.composeaudiocontrols.midi
 
+import dev.atsushieno.ktmidi.Midi2Machine
 import dev.atsushieno.ktmidi.MidiAccess
+import dev.atsushieno.ktmidi.MidiEvent
+import dev.atsushieno.ktmidi.MidiMachine
 import dev.atsushieno.ktmidi.MidiOutput
 import dev.atsushieno.ktmidi.MidiPortDetails
+import dev.atsushieno.ktmidi.Ump
 import dev.atsushieno.ktmidi.UmpFactory
+import dev.atsushieno.ktmidi.UmpRetriever
 import dev.atsushieno.ktmidi.toPlatformNativeBytes
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -13,6 +18,8 @@ interface MidiDeviceAccessScope {
     val outputs: List<MidiPortDetails>
     val send: MidiEventSender
     val useMidi2Protocol: Boolean
+    val midi1Machine: MidiMachine
+    val midi2Machine: Midi2Machine
     fun onSelectionChange(index: Int)
     fun onMidiProtocolChange(useMidi2: Boolean)
     fun cleanup()
@@ -21,9 +28,21 @@ interface MidiDeviceAccessScope {
 class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatchers: Boolean = true) : MidiDeviceAccessScope {
     private var openedOutput: MidiOutput? = null
     private var midi2 = false
+    override val midi1Machine by lazy {
+        MidiMachine().apply { channels[0].pitchbend = 0x2000 }
+    }
+    override val midi2Machine by lazy {
+        Midi2Machine().apply {
+            with(channel(0)) {
+                pitchbend = 0x80000000u
+                (0 until 127).forEach { perNotePitchbend[it] = 0x80000000u }
+            }
+        }
+    }
 
     override val outputs: List<MidiPortDetails>
         get() = access.outputs.toList()
+
     override val send: MidiEventSender
         get() = { mevent, offset, length, timestampInNanoseconds ->
             if (openedOutput != null) {
@@ -37,6 +56,15 @@ class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatcher
             }
             if (openedOutput == null || alwaysSendToDispatchers)
                 MidiKeyboardInputDispatcher.senders.forEach { it(mevent, offset, length, timestampInNanoseconds) }
+            if (useMidi2Protocol) {
+                Ump.fromBytes(mevent, offset, length).forEach {
+                    midi2Machine.processEvent(it)
+                }
+            } else {
+                MidiEvent.convert(mevent, offset, length).forEach {
+                    midi1Machine.processEvent(it)
+                }
+            }
         }
 
     override val useMidi2Protocol: Boolean
