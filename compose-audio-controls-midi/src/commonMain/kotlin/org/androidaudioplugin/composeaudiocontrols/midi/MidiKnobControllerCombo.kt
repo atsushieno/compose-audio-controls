@@ -230,19 +230,19 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
         var lastPNACCIndex by remember { mutableStateOf(0) }
         var lastBank by remember { mutableStateOf(0) }
 
+        val controlTarget = controlTargetCatalog[target]
         var control1 by remember { mutableStateOf(0.0f) }
-        val range1 = controlTargetCatalog[target].control1.range
+        val range1 = controlTarget.control1.range
         var control2 by remember { mutableStateOf(0.0f) }
-        val range2 = controlTargetCatalog[target].control2.range
+        val range2 = controlTarget.control2.range
         var control3 by remember { mutableStateOf(0.0f) }
-        val range3 = controlTargetCatalog[target].control3.range
+        val range3 = controlTarget.control3.range
         var discrete by remember { mutableStateOf(true) }
 
         if (targetChanged) {
-            val targetDef = controlTargetCatalog[target]
             if (useMidi2Protocol) {
                 val reg = midi2Machine.channel(0)
-                when (targetDef.status) {
+                when (controlTarget.status) {
                     MidiChannelStatus.CC -> {
                         control1 = lastCCIndex.toFloat()
                         control2 = (reg.controls[control1.toInt()] shr 25).toFloat()
@@ -295,7 +295,7 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                 }
             } else {
                 val reg = midi1Machine.channels[0]
-                when (targetDef.status) {
+                when (controlTarget.status) {
                     MidiChannelStatus.CC -> {
                         control1 = lastCCIndex.toFloat()
                         control2 = reg.controls[control1.toInt()].toFloat()
@@ -344,10 +344,10 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
 
         // update internal states before sending the actual value change
         // (or just update the internal states if it is not discrete).
-        val updateValueState by remember { mutableStateOf({ status: Int, v1: Int, v2: Int, v3: Int ->
+        val updateValueState by remember { mutableStateOf({ sendEvent: Boolean, controlTarget: ControlTargetDefinition, v1: Int, v2: Int, v3: Int ->
             // FIXME: maybe we could just keep midi2 impl.?
             if (useMidi2Protocol) {
-                when (controlTargetCatalog[target].status) {
+                when (controlTarget.status) {
                     MidiChannelStatus.CC -> lastCCIndex = v1
                     MidiChannelStatus.PAF -> lastPAFNote = v1
                     MidiChannelStatus.PER_NOTE_PITCH_BEND -> lastPNPBNote = v1
@@ -364,7 +364,7 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                     MidiChannelStatus.PROGRAM -> { lastBank = v2 * 0x80 + v3 }
                 }
             } else {
-                when (controlTargetCatalog[target].status) {
+                when (controlTarget.status) {
                     MidiChannelStatus.CC -> lastCCIndex = v1
                     MidiChannelStatus.PAF -> lastPAFNote = v1
                     MidiChannelStatus.PER_NOTE_PITCH_BEND,
@@ -375,8 +375,8 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                     MidiChannelStatus.PROGRAM -> lastBank = v2 * 0x80 + v3
                 }
             }
-            if (discrete)
-                sendValueChange(status, v1, v2, v3)
+            if (sendEvent && discrete)
+                sendValueChange(controlTarget.status, v1, v2, v3)
         })}
 
         ImageStripKnob(imageBitmap = knobBitmap,
@@ -386,12 +386,12 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
             tooltip = {
                 DefaultKnobTooltip(showTooltip = true, value = control1, valueText = when(target) {
                     0 -> WellKnownNames.ccNames[127.coerceAtMost(knobValue.toInt())] ?: "(N/A)"
-                    else -> controlTargetCatalog[target].control1.prefix + control1.toInt().toString()
+                    else -> controlTarget.control1.prefix + control1.toInt().toString()
                 })
             },
             onValueChange = {
                 control1 = it
-                updateValueState(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
+                updateValueState(controlTarget.control1.sendEvent, controlTarget, control1.toInt(), control2.toInt(), control3.toInt())
             })
 
         if (range2 != IntRange.EMPTY) {
@@ -400,30 +400,30 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                 value = control2,
                 valueRange = range2.first.toFloat()..range2.last.toFloat(),
                 tooltip = { DefaultKnobTooltip(showTooltip = true, value = control2,
-                    valueText = controlTargetCatalog[target].control2.prefix + control2.toInt().toString()) },
+                    valueText = controlTarget.control2.prefix + control2.toInt().toString()) },
                 onValueChange = {
                     control2 = it
-                    updateValueState(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
+                    updateValueState(controlTarget.control2.sendEvent, controlTarget, control1.toInt(), control2.toInt(), control3.toInt())
                 })
         }
 
-        if (controlTargetCatalog[target].control3.range != IntRange.EMPTY) {
+        if (controlTarget.control3.range != IntRange.EMPTY) {
             ImageStripKnob(imageBitmap = knobBitmap,
                 modifier = Modifier.padding(knobPadding, 0.dp),
                 value = control3,
                 valueRange = range3.first.toFloat()..range3.last.toFloat(),
                 tooltip = { DefaultKnobTooltip(showTooltip = true, value = control3,
-                    valueText = controlTargetCatalog[target].control3.prefix + control3.toInt().toString()) },
+                    valueText = controlTarget.control3.prefix + control3.toInt().toString()) },
                 onValueChange = {
                     control3 = it
-                    updateValueState(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
+                    updateValueState(controlTarget.control3.sendEvent, controlTarget, control1.toInt(), control2.toInt(), control3.toInt())
                 })
         }
 
         Box(Modifier.align(Alignment.CenterVertically).background(Color.White).padding(knobPadding, 0.dp)
             .clickable {
                 discrete = !discrete
-                updateValueState(controlTargetCatalog[target].status, control1.toInt(), control2.toInt(), control3.toInt())
+                updateValueState(true, controlTarget, control1.toInt(), control2.toInt(), control3.toInt())
             }) {
             Image(imageVector = if (discrete) Icons.Default.CheckCircle else Icons.Default.Close,
                 "send", Modifier.size(32.dp))
