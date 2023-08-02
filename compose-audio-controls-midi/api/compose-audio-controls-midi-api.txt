@@ -43,7 +43,7 @@ package org.androidaudioplugin.composeaudiocontrols.midi {
     method public void cleanup();
     method @NonNull public dev.atsushieno.ktmidi.MidiAccess getAccess();
     method public boolean getAlwaysSendToDispatchers();
-    method @NonNull public dev.atsushieno.ktmidi.MidiMachine getMidi1Machine();
+    method @NonNull public dev.atsushieno.ktmidi.Midi1Machine getMidi1Machine();
     method @NonNull public dev.atsushieno.ktmidi.Midi2Machine getMidi2Machine();
     method @NonNull public java.util.List<dev.atsushieno.ktmidi.MidiPortDetails> getOutputs();
     method @NonNull public kotlin.jvm.functions.Function4<byte[],java.lang.Integer,java.lang.Integer,java.lang.Long,kotlin.Unit> getSend();
@@ -52,7 +52,7 @@ package org.androidaudioplugin.composeaudiocontrols.midi {
     method public void onSelectionChange(int index);
     property @NonNull public final dev.atsushieno.ktmidi.MidiAccess access;
     property public final boolean alwaysSendToDispatchers;
-    property @NonNull public dev.atsushieno.ktmidi.MidiMachine midi1Machine;
+    property @NonNull public dev.atsushieno.ktmidi.Midi1Machine midi1Machine;
     property @NonNull public dev.atsushieno.ktmidi.Midi2Machine midi2Machine;
     property @NonNull public java.util.List<dev.atsushieno.ktmidi.MidiPortDetails> outputs;
     property @NonNull public kotlin.jvm.functions.Function4<byte[],java.lang.Integer,java.lang.Integer,java.lang.Long,kotlin.Unit> send;
@@ -61,14 +61,14 @@ package org.androidaudioplugin.composeaudiocontrols.midi {
 
   public interface MidiDeviceAccessScope {
     method public void cleanup();
-    method @NonNull public dev.atsushieno.ktmidi.MidiMachine getMidi1Machine();
+    method @NonNull public dev.atsushieno.ktmidi.Midi1Machine getMidi1Machine();
     method @NonNull public dev.atsushieno.ktmidi.Midi2Machine getMidi2Machine();
     method @NonNull public java.util.List<dev.atsushieno.ktmidi.MidiPortDetails> getOutputs();
     method @NonNull public kotlin.jvm.functions.Function4<byte[],java.lang.Integer,java.lang.Integer,java.lang.Long,kotlin.Unit> getSend();
     method public boolean getUseMidi2Protocol();
     method public void onMidiProtocolChange(boolean useMidi2);
     method public void onSelectionChange(int index);
-    property @NonNull public abstract dev.atsushieno.ktmidi.MidiMachine midi1Machine;
+    property @NonNull public abstract dev.atsushieno.ktmidi.Midi1Machine midi1Machine;
     property @NonNull public abstract dev.atsushieno.ktmidi.Midi2Machine midi2Machine;
     property @NonNull public abstract java.util.List<dev.atsushieno.ktmidi.MidiPortDetails> outputs;
     property @NonNull public abstract kotlin.jvm.functions.Function4<byte[],java.lang.Integer,java.lang.Integer,java.lang.Long,kotlin.Unit> send;
@@ -102,11 +102,13 @@ package org.androidaudioplugin.composeaudiocontrols.midi {
     method @NonNull public static java.util.List<org.androidaudioplugin.composeaudiocontrols.midi.ControlTargetDefinition> getControlTargetCatalog();
     method @NonNull public static org.androidaudioplugin.composeaudiocontrols.midi.ControlSettings getMidi1Control();
     method @NonNull public static kotlin.ranges.IntRange getMidi1Range();
+    method @NonNull public static kotlin.ranges.IntRange getMidi1Range14();
     method @NonNull public static org.androidaudioplugin.composeaudiocontrols.midi.ControlSettings getNoControl();
     method @NonNull public static org.androidaudioplugin.composeaudiocontrols.midi.ControlSettings getNoteControl();
     property @NonNull public static final java.util.List<org.androidaudioplugin.composeaudiocontrols.midi.ControlTargetDefinition> controlTargetCatalog;
     property @NonNull public static final org.androidaudioplugin.composeaudiocontrols.midi.ControlSettings midi1Control;
     property @NonNull public static final kotlin.ranges.IntRange midi1Range;
+    property @NonNull public static final kotlin.ranges.IntRange midi1Range14;
     property @NonNull public static final org.androidaudioplugin.composeaudiocontrols.midi.ControlSettings noControl;
     property @NonNull public static final org.androidaudioplugin.composeaudiocontrols.midi.ControlSettings noteControl;
   }
