@@ -1,14 +1,13 @@
 package org.androidaudioplugin.composeaudiocontrols.midi
 
+import dev.atsushieno.ktmidi.Midi1Machine
+import dev.atsushieno.ktmidi.Midi1Message
 import dev.atsushieno.ktmidi.Midi2Machine
 import dev.atsushieno.ktmidi.MidiAccess
-import dev.atsushieno.ktmidi.MidiEvent
-import dev.atsushieno.ktmidi.MidiMachine
 import dev.atsushieno.ktmidi.MidiOutput
 import dev.atsushieno.ktmidi.MidiPortDetails
 import dev.atsushieno.ktmidi.Ump
 import dev.atsushieno.ktmidi.UmpFactory
-import dev.atsushieno.ktmidi.UmpRetriever
 import dev.atsushieno.ktmidi.toPlatformNativeBytes
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -18,7 +17,7 @@ interface MidiDeviceAccessScope {
     val outputs: List<MidiPortDetails>
     val send: MidiEventSender
     val useMidi2Protocol: Boolean
-    val midi1Machine: MidiMachine
+    val midi1Machine: Midi1Machine
     val midi2Machine: Midi2Machine
     fun onSelectionChange(index: Int)
     fun onMidiProtocolChange(useMidi2: Boolean)
@@ -29,7 +28,7 @@ class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatcher
     private var openedOutput: MidiOutput? = null
     private var midi2 = false
     override val midi1Machine by lazy {
-        MidiMachine().apply { channels[0].pitchbend = 0x2000 }
+        Midi1Machine().apply { channels[0].pitchbend = 0x2000 }
     }
     override val midi2Machine by lazy {
         Midi2Machine().apply {
@@ -61,8 +60,8 @@ class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatcher
                     midi2Machine.processEvent(it)
                 }
             } else {
-                MidiEvent.convert(mevent, offset, length).forEach {
-                    midi1Machine.processEvent(it)
+                Midi1Message.convert(mevent, offset, length).forEach {
+                    midi1Machine.processMessage(it)
                 }
             }
         }

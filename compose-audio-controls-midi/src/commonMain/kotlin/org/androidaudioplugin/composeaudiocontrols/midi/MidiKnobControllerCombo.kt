@@ -35,7 +35,8 @@ import dev.atsushieno.ktmidi.toPlatformNativeBytes
 import org.androidaudioplugin.composeaudiocontrols.DefaultKnobTooltip
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
 
-val midi1Range = 0..127
+val midi1Range = 0 until 0x80
+val midi1Range14 = 0 until 0x80 * 0x80
 
 data class ControlSettings(val prefix: String = "", val sendEvent: Boolean = true, val range: IntRange = IntRange.EMPTY)
 val midi1Control = ControlSettings(range = midi1Range)
@@ -58,17 +59,17 @@ val controlTargetCatalog = listOf(
     ControlTargetDefinition("RPN", MidiChannelStatus.RPN,
         ControlSettings("M:", false, midi1Range),
         ControlSettings("L:", false, midi1Range),
-        ControlSettings("D:", range = midi1Range)),
+        ControlSettings("D:", range = midi1Range14)),
     ControlTargetDefinition("NRPN", MidiChannelStatus.NRPN,
         ControlSettings("M:", false, midi1Range),
         ControlSettings("L:", false, midi1Range),
-        ControlSettings("D:", range = midi1Range)),
+        ControlSettings("D:", range = midi1Range14)),
     ControlTargetDefinition("PN-RCC", MidiChannelStatus.PER_NOTE_RCC, noteControl,
         ControlSettings("idx:", false, midi1Range),
-        midi1Control),
+        ControlSettings("data:", range = midi1Range14)),
     ControlTargetDefinition("PN-ACC", MidiChannelStatus.PER_NOTE_ACC, noteControl,
         ControlSettings("idx:", false, midi1Range),
-        midi1Control),
+        ControlSettings("data:", range = midi1Range14)),
     ControlTargetDefinition("Program", MidiChannelStatus.PROGRAM,
         ControlSettings("P:", range = midi1Range),
         ControlSettings("BkM:", range = midi1Range),
@@ -150,31 +151,31 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
         }
         MidiChannelStatus.RPN -> {
             if (useMidi2Protocol) {
-                val ump = UmpFactory.midi2RPN(0, 0, v1, v2, v3.toLong() shl 25)
+                val ump = UmpFactory.midi2RPN(0, 0, v1, v2, v3.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
                 val bytes = arrayOf(MidiChannelStatus.CC.toByte(), MidiCC.RPN_MSB.toByte(), v1.toByte(),
                     MidiChannelStatus.CC.toByte(), MidiCC.RPN_LSB.toByte(), v2.toByte(),
-                    MidiChannelStatus.CC.toByte(), MidiCC.DTE_MSB.toByte(), v3.toByte(),
-                    MidiChannelStatus.CC.toByte(), MidiCC.DTE_LSB.toByte(), 0.toByte())
+                    MidiChannelStatus.CC.toByte(), MidiCC.DTE_MSB.toByte(), (v3 / 0x80).toByte(),
+                    MidiChannelStatus.CC.toByte(), MidiCC.DTE_LSB.toByte(), (v3 % 0x80).toByte())
                 send(bytes.toByteArray(), 0, bytes.size, 0)
             }
         }
         MidiChannelStatus.NRPN -> {
             if (useMidi2Protocol) {
-                val ump = UmpFactory.midi2NRPN(0, 0, v1, v2, v3.toLong() shl 25)
+                val ump = UmpFactory.midi2NRPN(0, 0, v1, v2, v3.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
                 val bytes = arrayOf(MidiChannelStatus.CC.toByte(), MidiCC.NRPN_MSB.toByte(), v1.toByte(),
                     MidiChannelStatus.CC.toByte(), MidiCC.NRPN_LSB.toByte(), v2.toByte(),
-                    MidiChannelStatus.CC.toByte(), MidiCC.DTE_MSB.toByte(), v3.toByte(),
-                    MidiChannelStatus.CC.toByte(), MidiCC.DTE_LSB.toByte(), 0.toByte())
+                    MidiChannelStatus.CC.toByte(), MidiCC.DTE_MSB.toByte(), (v3 / 0x80).toByte(),
+                    MidiChannelStatus.CC.toByte(), MidiCC.DTE_LSB.toByte(), (v3 % 0x80).toByte())
                 send(bytes.toByteArray(), 0, bytes.size, 0)
             }
         }
         MidiChannelStatus.PER_NOTE_RCC -> {
             if (useMidi2Protocol) {
-                val ump = UmpFactory.midi2PerNoteRCC(0, 0, v1, v2, v3.toLong() shl 25)
+                val ump = UmpFactory.midi2PerNoteRCC(0, 0, v1, v2, v3.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
                 // not supported in MIDI 1.0
@@ -182,7 +183,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
         }
         MidiChannelStatus.PER_NOTE_ACC -> {
             if (useMidi2Protocol) {
-                val ump = UmpFactory.midi2PerNoteACC(0, 0, v1, v2, v3.toLong() shl 25)
+                val ump = UmpFactory.midi2PerNoteACC(0, 0, v1, v2, v3.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
                 // not supported in MIDI 1.0
@@ -269,22 +270,22 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                     MidiChannelStatus.RPN -> {
                         control1 = (lastRPN / 0x80).toFloat()
                         control2 = (lastRPN % 0x80).toFloat()
-                        control3 = (reg.rpns[lastRPN] shr 25).toFloat()
+                        control3 = (reg.rpns[lastRPN] shr 18).toFloat()
                     }
                     MidiChannelStatus.NRPN -> {
                         control1 = (lastNRPN / 0x80).toFloat()
                         control2 = (lastNRPN % 0x80).toFloat()
-                        control3 = (reg.nrpns[lastNRPN] shr 25).toFloat()
+                        control3 = (reg.nrpns[lastNRPN] shr 18).toFloat()
                     }
                     MidiChannelStatus.PER_NOTE_RCC -> {
                         control1 = lastPNRCCNote.toFloat()
                         control2 = lastPNRCCIndex.toFloat()
-                        control3 = (reg.perNoteRCC[lastPNRCCNote][lastPNRCCIndex] shr 25).toFloat()
+                        control3 = (reg.perNoteRCC[lastPNRCCNote][lastPNRCCIndex] shr 18).toFloat()
                     }
                     MidiChannelStatus.PER_NOTE_ACC -> {
                         control1 = lastPNACCNote.toFloat()
                         control2 = lastPNACCIndex.toFloat()
-                        control3 = (reg.perNoteACC[lastPNACCNote][lastPNACCIndex] shr 25).toFloat()
+                        control3 = (reg.perNoteACC[lastPNACCNote][lastPNACCIndex] shr 18).toFloat()
                     }
                     MidiChannelStatus.PROGRAM -> {
                         control1 = midi1Machine.channels[0].program.toFloat()
@@ -293,44 +294,41 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                     }
                 }
             } else {
+                val reg = midi1Machine.channels[0]
                 when (targetDef.status) {
                     MidiChannelStatus.CC -> {
                         control1 = lastCCIndex.toFloat()
-                        control2 = midi1Machine.channels[0].controls[control1.toInt()].toFloat()
+                        control2 = reg.controls[control1.toInt()].toFloat()
                     }
                     MidiChannelStatus.CAF -> {
-                        control1 = midi1Machine.channels[0].caf.toFloat()
+                        control1 = reg.caf.toFloat()
                         control2 = 0f
                         control3 = 0f
                     }
                     MidiChannelStatus.PAF -> {
                         control1 = lastPAFNote.toFloat()
-                        control2 = midi1Machine.channels[0].pafVelocity[lastPAFNote].toFloat()
+                        control2 = reg.pafVelocity[lastPAFNote].toFloat()
                         control3 = 0f
                     }
                     MidiChannelStatus.PITCH_BEND -> {
-                        control1 = (midi1Machine.channels[0].pitchbend - 0x2000).toFloat()
+                        control1 = (reg.pitchbend - 0x2000).toFloat()
                         control2 = 0f
                         control3 = 0f
                     }
-                    MidiChannelStatus.PER_NOTE_PITCH_BEND -> {
-                        control1 = lastPNPBNote.toFloat()
-                        control2 = (midi1Machine.channels[0].pitchbend - 0x2000).toFloat()
-                        control3 = 0f
-                    }
+                    MidiChannelStatus.PER_NOTE_PITCH_BEND -> {} // N/A
                     MidiChannelStatus.RPN -> {
                         // The control3 value will not make sense without sending CC for RPN MSB/LSB,
                         // but they will be sent at send() consistently.
                         control1 = (lastRPN / 0x80).toFloat()
                         control2 = (lastRPN % 0x80).toFloat()
-                        control3 = midi1Machine.channels[0].controls[MidiCC.DTE_MSB].toFloat()
+                        control3 = reg.rpns[lastRPN].toFloat()
                     }
                     MidiChannelStatus.NRPN -> {
                         // The control3 value will not make sense without sending CC for RPN MSB/LSB,
                         // but they will be sent at send() consistently.
                         control1 = (lastNRPN / 0x80).toFloat()
                         control2 = (lastNRPN % 0x80).toFloat()
-                        control3 = midi1Machine.channels[0].controls[MidiCC.DTE_MSB].toFloat()
+                        control3 = reg.nrpns[lastNRPN].toFloat()
                     }
                     MidiChannelStatus.PER_NOTE_RCC -> {} // N/A
                     MidiChannelStatus.PER_NOTE_ACC -> {} // N/A
