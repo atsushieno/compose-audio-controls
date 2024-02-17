@@ -1,22 +1,22 @@
 [versions]
-compose-audio-controls = "0.3.1" # ourselves
-agp = "8.0.2"
+compose-audio-controls = "0.4.0" # ourselves
+agp = "8.2.2"
 compose-markdown = "0.3.4"
-kotlin = "1.8.10"
-core-ktx = "1.10.1"
+kotlin = "1.9.22"
+core-ktx = "1.12.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
-kotlinx-coroutines-core = "1.6.4"
-lifecycle-runtime-ktx = "2.6.1"
-activity-compose = "1.7.2"
-compose-bom = "2023.05.01"
-metalava-gradle = "0.3.3"
-dokka = "1.8.10"
-ktmidi_version = "0.6.0-preview2"
+kotlinx-coroutines-core = "1.7.3"
+lifecycle-runtime-ktx = "2.7.0"
+activity-compose = "1.8.2"
+compose-bom = "2024.02.00"
+metalava-gradle = "0.3.5"
+dokka = "1.9.10"
+ktmidi_version = "0.7.0"
 appcompat = "1.6.1"
-lifecycle-service = "2.6.1"
-material = "1.9.0"
+lifecycle-service = "2.7.0"
+compose-plugin = "1.5.12" # dev. version that Google publishes
 
 [libraries]
 compose-markdown = { module = "com.github.jeziellago:compose-markdown", version.ref = "compose-markdown" }
@@ -29,24 +29,25 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
-ui = { group = "androidx.compose.ui", name = "ui" }
-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-ui = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 ktmidi = { group = "dev.atsushieno", name = "ktmidi", version.ref = "ktmidi_version" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycle-service" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 dokkaPlugin = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 metalavaPlugin = { id = "me.tylerbwong.gradle.metalava", version.ref = "metalava-gradle" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+jetbrainsComposePlugin = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 
 [bundles]
 

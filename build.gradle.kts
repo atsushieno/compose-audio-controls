@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.dokkaPlugin) apply false
     alias(libs.plugins.metalavaPlugin) apply false
     alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.jetbrainsComposePlugin) apply false
 }
 
 // Use system environment variables

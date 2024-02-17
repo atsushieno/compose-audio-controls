@@ -11,11 +11,12 @@ buildscript {
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "1.4.0" // FIXME: can we avoid this? It may conflict with BOM
+    id("org.jetbrains.compose")
     id("org.jetbrains.dokka")
     id("maven-publish")
     id("signing")
-    id("me.tylerbwong.gradle.metalava")
+    // FIXME: unblock this once this issue is really fixed: https://github.com/tylerbwong/metalava-gradle/issues/81
+    //id("me.tylerbwong.gradle.metalava")
 }
 
 group = "org.androidaudioplugin"
@@ -62,12 +63,13 @@ kotlin {
                 implementation(libs.core.ktx)
             }
         }
+        /*
         val androidTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation(libs.junit)
             }
-        }
+        }*/
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
@@ -76,18 +78,20 @@ kotlin {
     }
 }
 
+// FIXME: unblock this once this issue is really fixed: https://github.com/tylerbwong/metalava-gradle/issues/81
+/*
 metalava {
     filename.set("api/$name-api.txt")
     outputKotlinNulls.set(false)
     includeSignatureVersion.set(false)
-}
+}*/
 
 android {
     namespace = "org.androidaudioplugin.composeaudiocontrols"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["test"].assets.srcDir("src/commonTest/resources") // kind of hack...
     defaultConfig {
-        compileSdk = 33
+        compileSdk = 34
         minSdk = 23
     }
     buildTypes {

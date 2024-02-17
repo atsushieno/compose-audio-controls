@@ -8,21 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,7 +24,6 @@ import org.androidaudioplugin.composeaudiocontrols.defaultKnobMinSizeInDp
 import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudioControlsTheme
 import org.androidaudioplugin.composeaudiocontrols.midi.DiatonicLiveMidiKeyboard
 import org.androidaudioplugin.composeaudiocontrols.midi.KtMidiDeviceAccessScope
-import org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceAccessScope
 import org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceConfigurator
 import kotlin.math.pow
 
@@ -63,7 +49,7 @@ fun DiatonicMidiKeyboardDemo() {
 
 @Composable
 fun SectionLabel(text: String) {
-    Divider()
+    HorizontalDivider()
     Text(
         text, fontSize = 20.sp, color = MaterialTheme.colorScheme.inversePrimary,
         modifier = Modifier
@@ -97,14 +83,14 @@ fun ImageStripKnobDemo() {
         var knobSize: Int? by remember { mutableStateOf(null) }
         KnobSizeSelector(knobSize, onSizeChange = { knobSize = it })
 
-        var knobStyle by remember { mutableStateOf(R.drawable.bright_life) }
+        var knobStyle by remember { mutableIntStateOf(R.drawable.bright_life) }
         KnobStyleSelector(knobStyle, onSelectionChange = { knobStyle = it })
 
         val scrollState = rememberScrollState()
         Column(Modifier.verticalScroll(scrollState)) {
             (0 until 10).forEach { paramIndex ->
                 Row {
-                    var paramValue by remember { mutableStateOf(0f) }
+                    var paramValue by remember { mutableFloatStateOf(0f) }
                     Text("Parameter $paramIndex: ", modifier = Modifier.align(Alignment.CenterVertically))
                     val minSize =
                         if (minSizeCheckedState) 1.dp
@@ -133,7 +119,7 @@ fun ImageStripKnobDemo() {
 @Composable
 fun KnobSizeSelector(size: Int?, onSizeChange: (size: Int?) -> Unit) {
     var checkedState by remember { mutableStateOf(false) }
-    var sizeOnSlider by remember { mutableStateOf(size?.toFloat() ?: 48f) }
+    var sizeOnSlider by remember { mutableFloatStateOf(size?.toFloat() ?: 48f) }
     val update = {
         if (checkedState)
             onSizeChange(sizeOnSlider.toInt())
