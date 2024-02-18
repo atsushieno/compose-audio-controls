@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.atsushieno.ktmidi.MidiCC
 import dev.atsushieno.ktmidi.MidiChannelStatus
 import dev.atsushieno.ktmidi.Ump
@@ -420,13 +422,15 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
                 })
         }
 
-        Box(Modifier.align(Alignment.CenterVertically).background(Color.White).padding(knobPadding, 0.dp)
-            .clickable {
-                discrete = !discrete
-                updateValueState(true, controlTarget, control1.toInt(), control2.toInt(), control3.toInt())
-            }) {
+        Column(Modifier.align(Alignment.CenterVertically).padding(knobPadding, 8.dp)) {
             Image(imageVector = if (discrete) Icons.Default.CheckCircle else Icons.Default.Close,
-                "send", Modifier.size(32.dp))
+                "send", Modifier.size(32.dp).background(Color.White).clickable {
+                    discrete = !discrete
+                    updateValueState(true, controlTarget, control1.toInt(), control2.toInt(), control3.toInt())
+                }
+            )
+            Spacer(Modifier.padding(0.dp, 4.dp))
+            Text(if (discrete) "discrete" else "", color = Color.Gray, fontSize = 12.sp)
         }
     }
 }
