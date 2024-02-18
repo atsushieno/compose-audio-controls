@@ -6,6 +6,7 @@ import dev.atsushieno.ktmidi.Midi2Machine
 import dev.atsushieno.ktmidi.MidiAccess
 import dev.atsushieno.ktmidi.MidiOutput
 import dev.atsushieno.ktmidi.MidiPortDetails
+import dev.atsushieno.ktmidi.MidiTransportProtocol
 import dev.atsushieno.ktmidi.Ump
 import dev.atsushieno.ktmidi.UmpFactory
 import dev.atsushieno.ktmidi.toPlatformNativeBytes
@@ -16,7 +17,12 @@ import kotlinx.coroutines.launch
 interface MidiDeviceAccessScope {
     val outputs: List<MidiPortDetails>
     val send: MidiEventSender
+    @Deprecated("use isTransportUmp instead",
+        ReplaceWith("isTransportUmp")
+    )
     val useMidi2Protocol: Boolean
+        get() = isTransportUmp
+    val isTransportUmp: Boolean
     val midi1Machine: Midi1Machine
     val midi2Machine: Midi2Machine
     fun onSelectionChange(index: Int)
@@ -24,9 +30,12 @@ interface MidiDeviceAccessScope {
     fun cleanup()
 }
 
-class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatchers: Boolean = true) : MidiDeviceAccessScope {
+class KtMidiDeviceAccessScope(
+    val access: MidiAccess,
+    val alwaysSendToDispatchers: Boolean = true
+) : MidiDeviceAccessScope {
     private var openedOutput: MidiOutput? = null
-    private var midi2 = false
+    private var useUmp = false
     override val midi1Machine by lazy {
         Midi1Machine().apply { channels[0].pitchbend = 0x2000 }
     }
@@ -55,7 +64,7 @@ class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatcher
             }
             if (openedOutput == null || alwaysSendToDispatchers)
                 MidiKeyboardInputDispatcher.senders.forEach { it(mevent, offset, length, timestampInNanoseconds) }
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 Ump.fromBytes(mevent, offset, length).forEach {
                     midi2Machine.processEvent(it)
                 }
@@ -66,8 +75,8 @@ class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatcher
             }
         }
 
-    override val useMidi2Protocol: Boolean
-        get() = midi2
+    override val isTransportUmp: Boolean
+        get() = useUmp
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onSelectionChange(index: Int) {
@@ -77,6 +86,17 @@ class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatcher
                 return@launch
             try {
                 openedOutput = access.openOutput(outputs[index].id)
+                if (outputs[index].midiTransportProtocol == MidiTransportProtocol.UMP)
+                    // When the transport is UMP, then always send UMP. No need to dare to fall back to MIDI1.
+                    useUmp = true
+                else {
+                    if (useUmp)
+                        // The user decided to send UMP over MIDI1 transport. AAPs can process them.
+                        // We send UMP Stream Configuration to (kind of) let the receiver know that
+                        // they are going to receive UMPs.
+                        onMidiProtocolChange(true)
+                    useUmp = false
+                }
             } catch(ex: Exception) {
                 // FIXME: we should have some logging functionality (needs to be x-plat)
                 println(ex)
@@ -88,10 +108,10 @@ class KtMidiDeviceAccessScope(val access: MidiAccess, val alwaysSendToDispatcher
         UmpFactory.streamConfigRequest(protocol, rxJRTimestamp = false, txJRTimestamp = true)
             .toPlatformNativeBytes()
 
-    override fun onMidiProtocolChange (useMidi2: Boolean) {
-        val bytes = midi2EndpointConfiguration(if (useMidi2) 2 else 1)
+    override fun onMidiProtocolChange (useUmp: Boolean) {
+        val bytes = midi2EndpointConfiguration(if (useUmp) 2 else 1)
         send(bytes, 0, bytes.size, 0)
-        midi2 = useMidi2
+        this.useUmp = useUmp
     }
 
     override fun cleanup() {

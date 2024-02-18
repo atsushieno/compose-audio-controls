@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.atsushieno.ktmidi.AndroidMidi2Access
 import dev.atsushieno.ktmidi.AndroidMidiAccess
 import dev.atsushieno.ktmidi.EmptyMidiAccess
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
@@ -40,7 +41,7 @@ fun MainContent() {
 @Composable
 fun DiatonicMidiKeyboardDemo() {
     val context = LocalContext.current
-    val midiAccess by remember { mutableStateOf(AndroidMidiAccess(context)) }
+    val midiAccess by remember { mutableStateOf(AndroidMidi2Access(context, true)) }
     val scope by remember { mutableStateOf(KtMidiDeviceAccessScope(midiAccess)) }
     SectionLabel("DiagnosticKeyboard Demo")
     scope.MidiDeviceConfigurator()

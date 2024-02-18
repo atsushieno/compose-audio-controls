@@ -29,7 +29,7 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
             noteOnStates.toList(),
             showExpressionSensitivitySlider = false,
             onNoteOn = { note, _ ->
-                if (useMidi2Protocol) {
+                if (isTransportUmp) {
                     val i64 = UmpFactory.midi2NoteOn(0, 0, note, 0, 0xF800, 0)
                     send(Ump(i64).toPlatformNativeBytes(), 0, 8, 0)
                 } else {
@@ -39,7 +39,7 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
                 noteOnStates[note] = 1
             },
             onNoteOff = { note, _ ->
-                if (useMidi2Protocol) {
+                if (isTransportUmp) {
                     val i64 = UmpFactory.midi2NoteOff(0, 0, note, 0, 0xF800, 0)
                     send(Ump(i64).toPlatformNativeBytes(), 0, 8, 0)
                 } else {
@@ -49,7 +49,7 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
                 noteOnStates[note] = 0
             },
             onExpression = { dir, note, data ->
-                if (useMidi2Protocol) {
+                if (isTransportUmp) {
                     // MIDI 2.0 mode:
                     // Pitch Bend for horizontal moves
                     if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {

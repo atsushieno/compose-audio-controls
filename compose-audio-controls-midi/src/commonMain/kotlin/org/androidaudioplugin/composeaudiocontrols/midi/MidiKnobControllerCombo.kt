@@ -104,7 +104,7 @@ fun ControlTargetSelector(modifier: Modifier = Modifier,
 private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int, v3: Int) {
     when(status) {
         MidiChannelStatus.CC -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2CC(0, 0, v1, v2.toLong() shl 25)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -113,7 +113,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.CAF -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2CAf(0, 0, v1.toLong() shl 25)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -122,7 +122,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.PAF -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2PAf(0, 0, v1, v2.toLong() shl 25)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -131,7 +131,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.PITCH_BEND -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2PitchBendDirect(0, 0, v1.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -142,7 +142,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.PER_NOTE_PITCH_BEND -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2PerNotePitchBendDirect(0, 0, v1, v2.toLong() shl 25)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -150,7 +150,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.RPN -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2RPN(0, 0, v1, v2, v3.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -162,7 +162,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.NRPN -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2NRPN(0, 0, v1, v2, v3.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -174,7 +174,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.PER_NOTE_RCC -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2PerNoteRCC(0, 0, v1, v2, v3.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -182,7 +182,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.PER_NOTE_ACC -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2PerNoteACC(0, 0, v1, v2, v3.toLong() shl 18)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -190,7 +190,7 @@ private fun MidiDeviceAccessScope.sendValueChange(status: Int, v1: Int, v2: Int,
             }
         }
         MidiChannelStatus.PROGRAM -> {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val ump = UmpFactory.midi2Program(0, 0, 0, v1, v2, v3)
                 send(Ump(ump).toPlatformNativeBytes(), 0, 8, 0)
             } else {
@@ -240,7 +240,7 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
         var discrete by remember { mutableStateOf(true) }
 
         if (targetChanged) {
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 val reg = midi2Machine.channel(0)
                 when (controlTarget.status) {
                     MidiChannelStatus.CC -> {
@@ -346,7 +346,7 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
         // (or just update the internal states if it is not discrete).
         val updateValueState by remember { mutableStateOf({ sendEvent: Boolean, controlTarget: ControlTargetDefinition, v1: Int, v2: Int, v3: Int ->
             // FIXME: maybe we could just keep midi2 impl.?
-            if (useMidi2Protocol) {
+            if (isTransportUmp) {
                 when (controlTarget.status) {
                     MidiChannelStatus.CC -> lastCCIndex = v1
                     MidiChannelStatus.PAF -> lastPAFNote = v1

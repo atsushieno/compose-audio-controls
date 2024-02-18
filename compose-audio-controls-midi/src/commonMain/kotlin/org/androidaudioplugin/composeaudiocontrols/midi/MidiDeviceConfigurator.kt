@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import dev.atsushieno.ktmidi.MidiPortDetails
+import dev.atsushieno.ktmidi.MidiTransportProtocol
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
@@ -27,7 +28,9 @@ import kotlinx.coroutines.launch
 fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
                          selectedMidiDeviceIndex: Int,
                          midiOutDeviceList: List<MidiPortDetails>,
-                         onSelectionChange: (Int) -> Unit = { _ -> }) {
+                         onSelectionChange: (Int) -> Unit = { _ -> },
+                         midi1DevicePrefix: String = "",
+                         umpDevicePrefix: String = "[2]") {
     Column {
         var listExpanded by remember { mutableStateOf(false) }
         val currentText =
@@ -46,7 +49,9 @@ fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
                 listExpanded = false
             })
             midiOutDeviceList.forEachIndexed { index, device ->
-                DropdownMenuItem(text = { Text(device.name ?: "(unknown port)", color = LocalContentColor.current) }, onClick = {
+                DropdownMenuItem(text = { Text(
+                    (if (device.midiTransportProtocol == MidiTransportProtocol.UMP) umpDevicePrefix else midi1DevicePrefix)
+                        + (device.name ?: "(unknown port)"), color = LocalContentColor.current) }, onClick = {
                     onSelectionChange(index)
                     listExpanded = false
                 })
@@ -79,6 +84,6 @@ fun MidiDeviceAccessScope.MidiDeviceConfigurator() {
                 umpSwitchBusy = false
             }
         })
-        Text("MIDI2", color = LocalContentColor.current, modifier = Modifier.align(Alignment.CenterVertically))
+        Text("UMP", color = LocalContentColor.current, modifier = Modifier.align(Alignment.CenterVertically))
     }
 }
