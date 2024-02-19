@@ -35,7 +35,14 @@ class KtMidiDeviceAccessScope(
     val alwaysSendToDispatchers: Boolean = true
 ) : MidiDeviceAccessScope {
     private var openedOutput: MidiOutput? = null
-    private var useUmp = false
+
+    private var use_ump = false
+    private var useUmp: Boolean
+        get() = use_ump
+        set(value) {
+            use_ump = value
+            MidiKeyboardInputDispatcher.useUmp = value
+        }
     override val midi1Machine by lazy {
         Midi1Machine().apply { channels[0].pitchbend = 0x2000 }
     }
