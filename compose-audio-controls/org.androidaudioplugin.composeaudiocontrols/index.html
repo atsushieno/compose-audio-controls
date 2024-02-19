@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>org.androidaudioplugin.composeaudiocontrols</title>
     <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -18,12 +19,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
 <link href="../../styles/style.css" rel="Stylesheet">
-<link href="../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
@@ -32,29 +34,34 @@
 <script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 </head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-            <a href="../../index.html">
-                    <span>compose-audio-controls</span>
-            </a>
-    </div>
-    <div>
-0.3.1    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../index.html">
+                            compose-audio-controls
+                    </a>
+            </div>
+            <div class="library-version">
+0.4.0            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":compose-audio-controls:dokkaHtml/androidMain">android</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":compose-audio-controls:dokkaHtml/commonMain">common</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
 <div class="main-content" data-page-type="package" id="content" pageIds="compose-audio-controls::org.androidaudioplugin.composeaudiocontrols////PointingToDeclaration//-970994930">
   <div class="breadcrumbs"><a href="../../index.html">compose-audio-controls</a><span class="delimiter">/</span><span class="current">org.androidaudioplugin.composeaudiocontrols</span></div>
   <div class="cover ">
@@ -127,6 +134,25 @@
           </div>
         </div>
       </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-2133690548%2FProperties%2F1455933850" anchor-label="defaultKnobMinSizeInDp" id="-2133690548%2FProperties%2F1455933850" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":compose-audio-controls:dokkaHtml/commonMain" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="default-knob-min-size-in-dp.html"><span>default</span><wbr></wbr><span>Knob</span><wbr></wbr><span>Min</span><wbr></wbr><span>Size</span><wbr></wbr><span>In</span><wbr></wbr><span><span>Dp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2133690548%2FProperties%2F1455933850"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":compose-audio-controls:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="default-knob-min-size-in-dp.html">defaultKnobMinSizeInDp</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/unit/Dp.html">Dp</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
         <div class="table"><a data-name="-1890239256%2FFunctions%2F1455933850" anchor-label="DefaultKnobTooltip" id="-1890239256%2FFunctions%2F1455933850" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain"></a>
@@ -174,8 +200,8 @@
               </div>
             </div>
           </div>
-<a data-name="-899578902%2FFunctions%2F-970994930" anchor-label="ImageStripKnob" id="-899578902%2FFunctions%2F-970994930" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain :compose-audio-controls:dokkaHtml/androidMain"></a>
-          <div class="table-row" data-filterable-current=":compose-audio-controls:dokkaHtml/commonMain :compose-audio-controls:dokkaHtml/androidMain" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain :compose-audio-controls:dokkaHtml/androidMain">
+<a data-name="-899578902%2FFunctions%2F-970994930" anchor-label="ImageStripKnob" id="-899578902%2FFunctions%2F-970994930" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain,:compose-audio-controls:dokkaHtml/androidMain"></a>
+          <div class="table-row" data-filterable-current=":compose-audio-controls:dokkaHtml/commonMain,:compose-audio-controls:dokkaHtml/androidMain" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain,:compose-audio-controls:dokkaHtml/androidMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-image-strip-knob.html"><span>Image</span><wbr></wbr><span>Strip</span><wbr></wbr><span><span>Knob</span></span></a></div>
@@ -186,7 +212,7 @@
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":compose-audio-controls:dokkaHtml/androidMain" data-filterable-set=":compose-audio-controls:dokkaHtml/androidMain" data-active="" data-toggle=":compose-audio-controls:dokkaHtml/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":compose-audio-controls:dokkaHtml/commonMain" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain" data-toggle=":compose-audio-controls:dokkaHtml/commonMain">common</button></div>
-<div class="content sourceset-dependent-content" data-togglable=":compose-audio-controls:dokkaHtml/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><a href="-image-strip-knob.html"><span class="token function">ImageStripKnob</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">modifier<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.html">Modifier</a><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/annotation/DrawableRes.html"><span class="token annotation builtin">DrawableRes</span></a> </span>drawableResId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">0.0f</span><span class="token punctuation">, </span></span><span class="parameter ">valueRange<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-closed-floating-point-range/index.html">ClosedFloatingPointRange</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span><span class="token operator"> = </span>0f..1f<span class="token punctuation">, </span></span><span class="parameter ">explicitSizeInDp<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/unit/Dp.html">Dp</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">minSizeInDp<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/unit/Dp.html">Dp</a><span class="token operator"> = </span>defaultKnobMinSizeInDp<span class="token punctuation">, </span></span><span class="parameter ">fineModeDelayMs<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1000</span><span class="token punctuation">, </span></span><span class="parameter ">tooltipColor<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator"> = </span>Color.Gray<span class="token punctuation">, </span></span><span class="parameter ">tooltip<span class="token operator">: </span><span><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a> </span><span class="token keyword"></span><span data-unresolved-link="org.androidaudioplugin.composeaudiocontrols/ImageStripKnobScope///PointingToDeclaration/">ImageStripKnobScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{
+<div class="content sourceset-dependent-content" data-togglable=":compose-audio-controls:dokkaHtml/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><a href="-image-strip-knob.html"><span class="token function">ImageStripKnob</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">modifier<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.html">Modifier</a><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/annotation/DrawableRes.html"><span class="token annotation builtin">DrawableRes</span></a> </span>drawableResId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">0.0f</span><span class="token punctuation">, </span></span><span class="parameter ">valueRange<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-closed-floating-point-range/index.html">ClosedFloatingPointRange</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span><span class="token operator"> = </span>0f..1f<span class="token punctuation">, </span></span><span class="parameter ">explicitSizeInDp<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/unit/Dp.html">Dp</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">minSizeInDp<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/unit/Dp.html">Dp</a><span class="token operator"> = </span>defaultKnobMinSizeInDp<span class="token punctuation">, </span></span><span class="parameter ">fineModeDelayMs<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1000</span><span class="token punctuation">, </span></span><span class="parameter ">tooltipColor<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/graphics/Color.html">Color</a><span class="token operator"> = </span>Color.Gray<span class="token punctuation">, </span></span><span class="parameter ">tooltip<span class="token operator">: </span><span><span class="token annotation builtin">@</span><a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Composable.html"><span class="token annotation builtin">Composable</span></a> </span><span class="token keyword"></span><a href="-image-strip-knob-scope/index.html">ImageStripKnobScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{
                        // by default, show tooltip only when it is being dragged
                        DefaultKnobTooltip(
                            value = knobValue,
@@ -207,34 +233,16 @@
           </div>
         </div>
       </div>
-      <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
-        <div class="table"><a data-name="-2133690548%2FProperties%2F1455933850" anchor-label="defaultKnobMinSizeInDp" id="-2133690548%2FProperties%2F1455933850" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":compose-audio-controls:dokkaHtml/commonMain" data-filterable-set=":compose-audio-controls:dokkaHtml/commonMain">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="default-knob-min-size-in-dp.html"><span>default</span><wbr></wbr><span>Knob</span><wbr></wbr><span>Min</span><wbr></wbr><span>Size</span><wbr></wbr><span>In</span><wbr></wbr><span><span>Dp</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2133690548%2FProperties%2F1455933850"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":compose-audio-controls:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="default-knob-min-size-in-dp.html">defaultKnobMinSizeInDp</a><span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/unit/Dp.html">Dp</a></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
       <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span
                 class="pull-right"><span>Generated by </span><a
                 href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>
