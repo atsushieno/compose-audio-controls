@@ -30,7 +30,7 @@ fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
                          midiOutDeviceList: List<MidiPortDetails>,
                          onSelectionChange: (Int) -> Unit = { _ -> },
                          midi1DevicePrefix: String = "",
-                         umpDevicePrefix: String = "[2]") {
+                         umpDevicePrefix: String = "[2] ") {
     Column {
         var listExpanded by remember { mutableStateOf(false) }
         val currentText =
