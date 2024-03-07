@@ -1,5 +1,5 @@
 [versions]
-compose-audio-controls = "0.4.1" # ourselves
+compose-audio-controls = "0.4.2" # ourselves
 agp = "8.2.2"
 compose-markdown = "0.3.4"
 kotlin = "1.9.22"
@@ -10,7 +10,7 @@ espresso-core = "3.5.1"
 kotlinx-coroutines-core = "1.8.0-RC2"
 lifecycle-runtime-ktx = "2.7.0"
 activity-compose = "1.8.2"
-compose-bom = "2024.02.01"
+compose-bom = "2024.02.02"
 metalava-gradle = "0.3.5"
 dokka = "1.9.10"
 ktmidi_version = "0.8.0-pre3"
