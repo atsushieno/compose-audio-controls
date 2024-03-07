@@ -73,9 +73,9 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
                     // MIDI 1.0 mode:
                     // Pitch Bend for horizontal moves
                     if (dir == DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging) {
-                        val dataIn7Bit = min(127, ((data * 64f).roundToInt() + 64)).toByte()
+                        val dataIn14Bit = min(16383, ((data * 8192f).roundToInt() + 8192)).toShort()
                         val bytes =
-                            byteArrayOf(MidiChannelStatus.PITCH_BEND.toByte(), dataIn7Bit, 0)
+                            byteArrayOf(MidiChannelStatus.PITCH_BEND.toByte(), (dataIn14Bit % 0x80).toByte(), (dataIn14Bit / 0x80).toByte())
                         send(bytes, 0, bytes.size, 0)
                     }
                     // MIDI 1.0 PAf for pressure
