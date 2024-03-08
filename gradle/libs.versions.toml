@@ -1,5 +1,5 @@
 [versions]
-compose-audio-controls = "0.4.2" # ourselves
+compose-audio-controls = "0.4.3" # ourselves
 agp = "8.2.2"
 compose-markdown = "0.3.4"
 kotlin = "1.9.22"
@@ -13,7 +13,7 @@ activity-compose = "1.8.2"
 compose-bom = "2024.02.02"
 metalava-gradle = "0.3.5"
 dokka = "1.9.10"
-ktmidi_version = "0.8.0-pre3"
+ktmidi_version = "0.8.0-pre4"
 appcompat = "1.6.1"
 lifecycle-service = "2.7.0"
 compose-plugin = "1.6.0" # dev. version that Google publishes
