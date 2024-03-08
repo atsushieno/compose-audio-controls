@@ -33,9 +33,21 @@ kotlin {
             useJUnit()
         }
     }
-    android {
+    androidTarget {
         publishLibraryVariantsGroupedByFlavor = true
         publishLibraryVariants("debug", "release")
+    }
+    wasmJs {
+        browser {}
+    }
+    listOf(
+        iosArm64(),
+        iosX64(),
+        iosSimulatorArm64()
+    ).onEach {
+        it.binaries {
+            framework { baseName = "ktmidi" }
+        }
     }
 
     sourceSets {

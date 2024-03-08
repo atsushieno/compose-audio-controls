@@ -17,6 +17,7 @@ ktmidi_version = "0.8.0-pre4"
 appcompat = "1.6.1"
 lifecycle-service = "2.7.0"
 compose-plugin = "1.6.0" # dev. version that Google publishes
+kotlinx-datetime = "0.5.0"
 
 [libraries]
 compose-markdown = { module = "com.github.jeziellago:compose-markdown", version.ref = "compose-markdown" }
@@ -39,6 +40,7 @@ compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 ktmidi = { group = "dev.atsushieno", name = "ktmidi", version.ref = "ktmidi_version" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycle-service" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

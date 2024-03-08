@@ -1,5 +1,3 @@
-import org.jetbrains.compose.compose
-
 buildscript {
     repositories {
         maven("https://plugins.gradle.org/m2/")
@@ -33,9 +31,21 @@ kotlin {
             useJUnit()
         }
     }
-    android {
+    androidTarget {
         publishLibraryVariantsGroupedByFlavor = true
         publishLibraryVariants("debug", "release")
+    }
+    wasmJs {
+        browser {}
+    }
+    listOf(
+        iosArm64(),
+        iosX64(),
+        iosSimulatorArm64()
+    ).onEach {
+        it.binaries {
+            framework { baseName = "ktmidi" }
+        }
     }
 
     sourceSets {
@@ -46,6 +56,7 @@ kotlin {
                 api(compose.material3)
                 api(compose.ui)
 
+                implementation(libs.kotlinx.datetime)
                 implementation(libs.ktmidi)
             }
         }

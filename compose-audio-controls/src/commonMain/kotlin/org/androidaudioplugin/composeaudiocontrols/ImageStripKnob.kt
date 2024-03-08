@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import kotlinx.datetime.Clock
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -42,7 +43,7 @@ import kotlin.math.roundToInt
 //  https://support.google.com/accessibility/android/answer/7101858?hl=en
 val defaultKnobMinSizeInDp = 48.dp
 
-internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toBigDecimal().toPlainString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
+internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toDouble().toString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
 
 /**
  * Implements a knob control that is based on KnobMan image strip.
@@ -151,8 +152,9 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
         val draggableState = rememberDraggableState(onDelta = {
             val deltaInDp = it.toDp()
 
-            inFineHoldMode = inFineHoldMode || System.currentTimeMillis() - lastDragActionTimeInMillis > fineModeDelayMs
-            lastDragActionTimeInMillis = System.currentTimeMillis()
+            val now = Clock.System.now().toEpochMilliseconds()
+            inFineHoldMode = inFineHoldMode || now - lastDragActionTimeInMillis > fineModeDelayMs
+            lastDragActionTimeInMillis = now
 
             // So far let's assume that 160dp = 1 inch for full motion range.
             // 0.5 inch for half circle-ish.
@@ -188,7 +190,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
                         awaitPointerEventScope {
                             while (true) {
                                 awaitFirstDown()
-                                lastDragActionTimeInMillis = System.currentTimeMillis()
+                                lastDragActionTimeInMillis = Clock.System.now().toEpochMilliseconds()
                             }
                         }
                     }
