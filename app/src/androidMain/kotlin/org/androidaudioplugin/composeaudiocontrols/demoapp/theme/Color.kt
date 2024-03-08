@@ -1,4 +1,4 @@
-package org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme
+package org.androidaudioplugin.composeaudiocontrols.demoapp.theme
 
 import androidx.compose.ui.graphics.Color
 

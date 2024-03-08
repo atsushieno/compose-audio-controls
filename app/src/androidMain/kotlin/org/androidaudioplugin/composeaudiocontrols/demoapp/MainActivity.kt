@@ -8,13 +8,18 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudioControlsTheme
+import dev.atsushieno.ktmidi.AndroidMidi2Access
+import org.androidaudioplugin.composeaudiocontrols.demoapp.MainContent
+import org.androidaudioplugin.composeaudiocontrols.demoapp.theme.ComposeAudioControlsTheme
 import kotlin.system.exitProcess
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        midiAccess = AndroidMidi2Access(this, true)
         setContent {
             ComposeAudioControlsTheme {
                 // A surface container using the 'background' color from the theme

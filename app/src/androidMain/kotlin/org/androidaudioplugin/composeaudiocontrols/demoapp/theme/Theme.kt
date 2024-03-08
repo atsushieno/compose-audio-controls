@@ -1,4 +1,4 @@
-package org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme
+package org.androidaudioplugin.composeaudiocontrols.demoapp.theme
 
 import android.app.Activity
 import android.os.Build

@@ -13,22 +13,32 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.atsushieno.ktmidi.AndroidMidi2Access
-import dev.atsushieno.ktmidi.AndroidMidiAccess
+import composeaudiocontrols.app.generated.resources.*
+import composeaudiocontrols.app.generated.resources.Res
+import composeaudiocontrols.app.generated.resources.bright_life
+import composeaudiocontrols.app.generated.resources.knob_blue
+import composeaudiocontrols.app.generated.resources.vst_knob_01_100pix
 import dev.atsushieno.ktmidi.EmptyMidiAccess
+import dev.atsushieno.ktmidi.MidiAccess
+import org.androidaudioplugin.composeaudiocontrols.DefaultKnobTooltip
 import org.androidaudioplugin.composeaudiocontrols.ImageStripKnob
+import org.androidaudioplugin.composeaudiocontrols.ImageStripKnobScope
 import org.androidaudioplugin.composeaudiocontrols.defaultKnobMinSizeInDp
-import org.androidaudioplugin.composeaudiocontrols.demoapp.ui.theme.ComposeAudioControlsTheme
 import org.androidaudioplugin.composeaudiocontrols.midi.DiatonicLiveMidiKeyboard
 import org.androidaudioplugin.composeaudiocontrols.midi.KtMidiDeviceAccessScope
 import org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceConfigurator
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.imageResource
 import kotlin.math.pow
 
-internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toBigDecimal().toPlainString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
+internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toDouble().toString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
+
+var midiAccess: MidiAccess = EmptyMidiAccess()
 
 @Composable
 fun MainContent() {
@@ -40,8 +50,6 @@ fun MainContent() {
 
 @Composable
 fun DiatonicMidiKeyboardDemo() {
-    val context = LocalContext.current
-    val midiAccess by remember { mutableStateOf(AndroidMidi2Access(context, true)) }
     val scope by remember { mutableStateOf(KtMidiDeviceAccessScope(midiAccess)) }
     SectionLabel("DiagnosticKeyboard Demo")
     scope.MidiDeviceConfigurator()
@@ -60,14 +68,7 @@ fun SectionLabel(text: String) {
     Divider()
 }
 
-@Preview(showBackground = true)
-@Composable
-fun KnobPreview() {
-    ComposeAudioControlsTheme {
-        ImageStripKnobDemo()
-    }
-}
-
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun ImageStripKnobDemo() {
     Column {
@@ -84,7 +85,7 @@ fun ImageStripKnobDemo() {
         var knobSize: Int? by remember { mutableStateOf(null) }
         KnobSizeSelector(knobSize, onSizeChange = { knobSize = it })
 
-        var knobStyle by remember { mutableIntStateOf(R.drawable.bright_life) }
+        var knobStyle by remember { mutableStateOf(Res.drawable.bright_life) }
         KnobStyleSelector(knobStyle, onSelectionChange = { knobStyle = it })
 
         val scrollState = rememberScrollState()
@@ -97,7 +98,7 @@ fun ImageStripKnobDemo() {
                         if (minSizeCheckedState) 1.dp
                         else if ((48 > (knobSize ?: 48))) knobSize!!.dp
                         else defaultKnobMinSizeInDp
-                    ImageStripKnob(drawableResId = knobStyle,
+                    ImageStripKnob(drawableRes = knobStyle,
                         value = paramValue,
                         valueRange = 0f..1f * 2f.pow(paramIndex.toFloat()),
                         minSizeInDp = minSize,
@@ -145,14 +146,14 @@ fun KnobSizeSelector(size: Int?, onSizeChange: (size: Int?) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
-fun KnobStyleSelector(currentResId: Int, onSelectionChange: (id: Int) -> Unit) {
+fun KnobStyleSelector(currentResId: DrawableResource, onSelectionChange: (id: DrawableResource) -> Unit) {
     val imageOptions = mapOf(
-        R.drawable.bright_life to "bright_life",
-        R.drawable.chromed_knob to "chromed_knob",
-        R.drawable.knob_blue to "knob_blue",
-        R.drawable.vst_knob_01_100pix to "vst_knob_01_100pix")
+        Res.drawable.bright_life to "bright_life",
+        Res.drawable.chromed_knob to "chromed_knob",
+        Res.drawable.knob_blue to "knob_blue",
+        Res.drawable.vst_knob_01_100pix to "vst_knob_01_100pix")
     var imageOptionsExpanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         expanded = imageOptionsExpanded,
@@ -187,14 +188,41 @@ fun KnobStyleSelector(currentResId: Int, onSelectionChange: (id: Int) -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
+
+// FIXME: can we have this implementation in library, not app?
+//  Currently `DrawableResource` and `imageResource` are not in accessible libraries
+//  unless any resource is actually generated...
+@OptIn(ExperimentalResourceApi::class)
 @Composable
-fun DiatonicKeyboardPreview() {
-    ComposeAudioControlsTheme {
-        Column {
-            val scope by remember { mutableStateOf(KtMidiDeviceAccessScope(EmptyMidiAccess())) }
-            scope.MidiDeviceConfigurator()
-            scope.DiatonicLiveMidiKeyboard()
-        }
-    }
+fun ImageStripKnob(modifier: Modifier = Modifier,
+                   drawableRes: DrawableResource,
+                   value: Float = 0f,
+                   valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+                   explicitSizeInDp: Dp? = null,
+                   minSizeInDp: Dp = defaultKnobMinSizeInDp,
+                   fineModeDelayMs: Int = 1000,
+                   tooltipColor: Color = Color.Gray,
+                   tooltip: @Composable ImageStripKnobScope.() -> Unit = {
+                       // by default, show tooltip only when it is being dragged
+                       DefaultKnobTooltip(
+                           value = knobValue,
+                           showTooltip = knobIsBeingDragged,
+                           textColor = tooltipColor
+                       )
+                   },
+                   onValueChange: (value: Float) -> Unit = {}
+) {
+    val imageBitmap = imageResource(drawableRes)
+    ImageStripKnob(
+        modifier,
+        imageBitmap,
+        value,
+        valueRange,
+        explicitSizeInDp,
+        minSizeInDp,
+        fineModeDelayMs,
+        tooltipColor,
+        tooltip,
+        onValueChange
+    )
 }
