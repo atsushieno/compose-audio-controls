@@ -74,16 +74,16 @@ kotlin {
                 implementation(libs.core.ktx)
             }
         }
-        /*
-        val androidTest by getting {
+        val androidInstrumentedTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation(libs.junit)
             }
-        }*/
+        }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
+                implementation(libs.junit)
             }
         }
     }
