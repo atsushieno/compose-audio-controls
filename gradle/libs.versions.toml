@@ -1,22 +1,22 @@
 [versions]
-compose-audio-controls = "0.5.0" # ourselves
+compose-audio-controls = "0.5.1" # ourselves
 agp = "8.2.2"
 compose-markdown = "0.3.4"
-kotlin = "1.9.22"
-core-ktx = "1.12.0"
+kotlin = "1.9.23"
+core-ktx = "1.13.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
-kotlinx-coroutines-core = "1.8.0-RC2"
+kotlinx-coroutines-core = "1.8.0"
 lifecycle-runtime-ktx = "2.7.0"
-activity-compose = "1.8.2"
-compose-bom = "2024.03.00"
+activity-compose = "1.9.0"
+compose-bom = "2024.04.01"
 metalava-gradle = "0.3.5"
 dokka = "1.9.10"
-ktmidi_version = "0.8.0-pre4"
+ktmidi_version = "0.8.2"
 appcompat = "1.6.1"
 lifecycle-service = "2.7.0"
-compose-plugin = "1.6.0"
+compose-plugin = "1.6.2"
 kotlinx-datetime = "0.5.0"
 
 [libraries]
