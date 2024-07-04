@@ -1,8 +1,10 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("multiplatform")
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.gradleJavacppPlatform)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsComposePlugin)
 }
 
@@ -70,7 +72,7 @@ kotlin {
 
 android {
     namespace = "org.androidaudioplugin.composeaudiocontrols.demoapp"
-    compileSdk = 34
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
@@ -78,8 +80,8 @@ android {
 
     defaultConfig {
         applicationId = "org.androidaudioplugin.composeaudiocontrols.demoapp"
-        minSdk = 23
-        targetSdk = 34
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
     }

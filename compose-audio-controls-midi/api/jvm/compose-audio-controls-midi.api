@@ -1,0 +1,114 @@
+public final class org/androidaudioplugin/composeaudiocontrols/midi/ComposableSingletons$MidiDeviceConfiguratorKt {
+	public static final field INSTANCE Lorg/androidaudioplugin/composeaudiocontrols/midi/ComposableSingletons$MidiDeviceConfiguratorKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function2;
+	public fun <init> ()V
+	public final fun getLambda-1$compose_audio_controls_midi ()Lkotlin/jvm/functions/Function2;
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/ControlSettings {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;ZLkotlin/ranges/IntRange;)V
+	public synthetic fun <init> (Ljava/lang/String;ZLkotlin/ranges/IntRange;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Z
+	public final fun component3 ()Lkotlin/ranges/IntRange;
+	public final fun copy (Ljava/lang/String;ZLkotlin/ranges/IntRange;)Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public static synthetic fun copy$default (Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Ljava/lang/String;ZLkotlin/ranges/IntRange;ILjava/lang/Object;)Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPrefix ()Ljava/lang/String;
+	public final fun getRange ()Lkotlin/ranges/IntRange;
+	public final fun getSendEvent ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/ControlTargetDefinition {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/String;ILorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;)V
+	public synthetic fun <init> (Ljava/lang/String;ILorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public final fun component4 ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public final fun component5 ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public final fun copy (Ljava/lang/String;ILorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;)Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlTargetDefinition;
+	public static synthetic fun copy$default (Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlTargetDefinition;Ljava/lang/String;ILorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;ILjava/lang/Object;)Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlTargetDefinition;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getControl1 ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public final fun getControl2 ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public final fun getControl3 ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public final fun getLabel ()Ljava/lang/String;
+	public final fun getStatus ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/DiatonicLiveMidiKeyboardKt {
+	public static final fun DiatonicLiveMidiKeyboard (Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope;Landroidx/compose/runtime/Composer;I)V
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/KtMidiDeviceAccessScope : org/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope {
+	public static final field $stable I
+	public fun <init> (Ldev/atsushieno/ktmidi/MidiAccess;Z)V
+	public synthetic fun <init> (Ldev/atsushieno/ktmidi/MidiAccess;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun cleanup ()V
+	public final fun getAccess ()Ldev/atsushieno/ktmidi/MidiAccess;
+	public final fun getAlwaysSendToDispatchers ()Z
+	public fun getMidi1Machine ()Ldev/atsushieno/ktmidi/Midi1Machine;
+	public fun getMidi2Machine ()Ldev/atsushieno/ktmidi/Midi2Machine;
+	public fun getOutputs ()Ljava/util/List;
+	public fun getSend ()Lkotlin/jvm/functions/Function4;
+	public fun getUseMidi2Protocol ()Z
+	public fun isTransportUmp ()Z
+	public fun onMidiProtocolChange (Z)V
+	public fun onSelectionChange (I)V
+}
+
+public abstract interface class org/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope {
+	public abstract fun cleanup ()V
+	public abstract fun getMidi1Machine ()Ldev/atsushieno/ktmidi/Midi1Machine;
+	public abstract fun getMidi2Machine ()Ldev/atsushieno/ktmidi/Midi2Machine;
+	public abstract fun getOutputs ()Ljava/util/List;
+	public abstract fun getSend ()Lkotlin/jvm/functions/Function4;
+	public abstract fun getUseMidi2Protocol ()Z
+	public abstract fun isTransportUmp ()Z
+	public abstract fun onMidiProtocolChange (Z)V
+	public abstract fun onSelectionChange (I)V
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope$DefaultImpls {
+	public static fun getUseMidi2Protocol (Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope;)Z
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceConfiguratorKt {
+	public static final fun KtMidiDeviceSelector (Landroidx/compose/ui/Modifier;ILjava/util/List;Lkotlin/jvm/functions/Function1;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
+	public static final fun MidiDeviceConfigurator (Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope;Landroidx/compose/runtime/Composer;I)V
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/MidiKeyboardInputDispatcher {
+	public static final field $stable I
+	public static final field INSTANCE Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiKeyboardInputDispatcher;
+	public final fun getSenders ()Ljava/util/List;
+	public final fun getUseUmp ()Z
+	public final fun setUseUmp (Z)V
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/MidiKeyboardMainKt {
+	public static final fun MidiKeyboardMain (Ldev/atsushieno/ktmidi/MidiAccess;Landroidx/compose/runtime/Composer;I)V
+	public static final fun MidiKeyboardMain (Ldev/atsushieno/ktmidi/MidiAccess;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;II)V
+	public static final fun MidiKeyboardMain (Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope;Landroidx/compose/runtime/Composer;I)V
+	public static final fun MidiKeyboardMain (Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/midi/MidiKnobControllerComboKt {
+	public static final fun ControlTargetSelector (Landroidx/compose/ui/Modifier;ILjava/util/List;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)V
+	public static final fun MidiKnobControllerCombo (Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope;Landroidx/compose/ui/graphics/ImageBitmap;Landroidx/compose/runtime/Composer;I)V
+	public static final fun getControlTargetCatalog ()Ljava/util/List;
+	public static final fun getMidi1Control ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public static final fun getMidi1Range ()Lkotlin/ranges/IntRange;
+	public static final fun getMidi1Range14 ()Lkotlin/ranges/IntRange;
+	public static final fun getNoControl ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+	public static final fun getNoteControl ()Lorg/androidaudioplugin/composeaudiocontrols/midi/ControlSettings;
+}
+

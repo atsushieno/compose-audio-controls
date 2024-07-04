@@ -9,14 +9,14 @@ buildscript {
 }
 
 plugins {
-    id("com.android.library")
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-    id("org.jetbrains.dokka")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.dokkaPlugin)
+    alias(libs.plugins.binaryCompatibilityValidatorPlugin)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.jetbrainsComposePlugin)
     id("maven-publish")
     id("signing")
-    // FIXME: unblock this once this issue is really fixed: https://github.com/tylerbwong/metalava-gradle/issues/81
-    //id("me.tylerbwong.gradle.metalava")
 }
 
 group = "org.androidaudioplugin"
@@ -91,21 +91,13 @@ kotlin {
     }
 }
 
-// FIXME: unblock this once this issue is really fixed: https://github.com/tylerbwong/metalava-gradle/issues/81
-/*
-metalava {
-    filename.set("api/$name-api.txt")
-    outputKotlinNulls.set(false)
-    includeSignatureVersion.set(false)
-}*/
-
 android {
     namespace = "org.androidaudioplugin.composeaudiocontrols.midi"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["test"].assets.srcDir("src/commonTest/resources") // kind of hack...
     defaultConfig {
-        compileSdk = 34
-        minSdk = 23
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     buildTypes {
         val debug by getting

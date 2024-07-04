@@ -1,0 +1,41 @@
+public final class org/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardKt {
+	public static final fun DiatonicKeyboard-gHaE34I (Ljava/util/List;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardMoveAction;IIIFFLandroidx/compose/ui/unit/Dp;FJJJJLandroidx/compose/runtime/Composer;III)V
+	public static final fun DiatonicKeyboardWithControllers-SDUnXIs (Ljava/util/List;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;ZZZLorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardMoveAction;IIIFFLandroidx/compose/ui/unit/Dp;FJJJJLandroidx/compose/runtime/Composer;III)V
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardMoveAction : java/lang/Enum {
+	public static final field NoteChange Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardMoveAction;
+	public static final field NoteExpression Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardMoveAction;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardMoveAction;
+	public static fun values ()[Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardMoveAction;
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardNoteExpressionOrigin : java/lang/Enum {
+	public static final field HorizontalDragging Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardNoteExpressionOrigin;
+	public static final field Pressure Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardNoteExpressionOrigin;
+	public static final field VerticalDragging Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardNoteExpressionOrigin;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardNoteExpressionOrigin;
+	public static fun values ()[Lorg/androidaudioplugin/composeaudiocontrols/DiatonicKeyboardNoteExpressionOrigin;
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/ImageStripKnobKt {
+	public static final fun DefaultKnobTooltip-uDo3WH8 (Landroidx/compose/ui/Modifier;ZFJLjava/lang/String;Landroidx/compose/runtime/Composer;II)V
+	public static final fun DefaultKnobTooltip-ww6aTOc (Landroidx/compose/ui/Modifier;ZFJLandroidx/compose/runtime/Composer;II)V
+	public static final fun ImageStripKnob-WfqU4hI (Landroidx/compose/ui/Modifier;Landroidx/compose/ui/graphics/ImageBitmap;FLkotlin/ranges/ClosedFloatingPointRange;Landroidx/compose/ui/unit/Dp;FIJLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)V
+	public static final fun getDefaultKnobMinSizeInDp ()F
+}
+
+public abstract interface class org/androidaudioplugin/composeaudiocontrols/ImageStripKnobScope {
+	public abstract fun getKnobIsBeingDragged ()Z
+	public abstract fun getKnobValue ()F
+}
+
+public final class org/androidaudioplugin/composeaudiocontrols/ScalingPainter : androidx/compose/ui/graphics/painter/Painter {
+	public static final field $stable I
+	public synthetic fun <init> (Landroidx/compose/ui/graphics/ImageBitmap;JJFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Landroidx/compose/ui/graphics/ImageBitmap;JJFLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getIntrinsicSize-NH-jbRc ()J
+}
+

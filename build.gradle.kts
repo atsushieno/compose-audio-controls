@@ -1,11 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.androidApplication) apply false
-    alias(libs.plugins.kotlinAndroid) apply false
+    alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.dokkaPlugin) apply false
-    alias(libs.plugins.metalavaPlugin) apply false
+    alias(libs.plugins.binaryCompatibilityValidatorPlugin) apply false
     alias(libs.plugins.androidLibrary) apply false
-    alias(libs.plugins.jetbrainsComposePlugin) apply false
+    alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.jetbrainsComposePlugin)
+    alias(libs.plugins.gradleJavacppPlatform) apply false
 }
 
 // Use system environment variables
