@@ -2,25 +2,20 @@ package org.androidaudioplugin.composeaudiocontrols.midi
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import dev.atsushieno.ktmidi.MidiPortDetails
 import dev.atsushieno.ktmidi.MidiTransportProtocol
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -56,11 +51,12 @@ fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
                     listExpanded = false
                 })
             }
+            // FIXME: remove it once Google fixed this DropdownMenu bug: https://issuetracker.google.com/issues/346086163
+            Text("An extra line to workaround Google bug 346086163", Modifier.height(50.dp))
         }
     }
 }
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun MidiDeviceAccessScope.MidiDeviceConfigurator() {
     Row {
@@ -73,13 +69,14 @@ fun MidiDeviceAccessScope.MidiDeviceConfigurator() {
                 onSelectionChange(it)
             })
 
+        val coroutineScope = rememberCoroutineScope()
         var umpSwitchBusy by remember { mutableStateOf(false) }
         var useUMP by remember { mutableStateOf(false) }
         Checkbox(enabled = !umpSwitchBusy, checked = useUMP, onCheckedChange = {
             umpSwitchBusy = true
             useUMP = !useUMP
             onMidiProtocolChange(useUMP)
-            GlobalScope.launch {
+            coroutineScope.launch {
                 delay(500)
                 umpSwitchBusy = false
             }
