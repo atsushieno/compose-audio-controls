@@ -77,7 +77,7 @@ jobs:
     # FIXME: we should probably publish compose-audio-controls-midi API too
     - name: deploy to GitHub Pages
       if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
-      uses: JamesIves/github-pages-deploy-action@4
+      uses: JamesIves/github-pages-deploy-action@4.1.2
       with:
         branch: gh-pages
         folder: compose-audio-controls/build/dokka/html
