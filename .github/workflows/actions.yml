@@ -30,8 +30,8 @@ jobs:
     - name: rewrite build.gradle.kts to require signing
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        sed -i "s/signing {}/signing { sign(publishing.publications) }/" compose-audio-controls/build.gradle.kts
-        sed -i "s/signing {}/signing { sign(publishing.publications) }/" compose-audio-controls-midi/build.gradle.kts
+        sed -i "" "s/signing {}/signing { sign(publishing.publications) }/" compose-audio-controls/build.gradle.kts
+        sed -i "" "s/signing {}/signing { sign(publishing.publications) }/" compose-audio-controls-midi/build.gradle.kts
 
     # build or publish, depending on whether it is for release tags or not
     - name: build (ONLY FOR NON-RELEASES)
