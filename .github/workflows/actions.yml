@@ -13,9 +13,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: apt update
-      run: |
-        sudo apt-get update
     - name: set up JDK 17
       uses: actions/setup-java@v4
       with:
