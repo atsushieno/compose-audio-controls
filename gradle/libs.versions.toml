@@ -1,5 +1,5 @@
 [versions]
-compose-audio-controls = "0.6.1" # ourselves
+compose-audio-controls = "0.6.2" # ourselves
 agp = "8.2.2"
 android-compileSdk = "35"
 android-minSdk = "23"
@@ -8,11 +8,11 @@ kotlin = "2.0.0"
 core-ktx = "1.13.1"
 junit = "4.13.2"
 kotlinx-coroutines-core = "1.9.0-RC"
-activity-compose = "1.9.0"
+activity-compose = "1.9.1"
 compose-bom = "2024.06.00"
 dokka = "1.9.20"
-ktmidi_version = "0.9.0"
-compose-plugin = "1.6.10"
+ktmidi_version = "0.9.1"
+compose-plugin = "1.6.11"
 kotlinx-datetime = "0.6.0"
 gradle-javacpp = "1.5.10"
 binary-compatibility-validator = "0.14.0"
