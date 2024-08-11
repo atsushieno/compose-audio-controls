@@ -18,6 +18,8 @@ import dev.atsushieno.ktmidi.MidiTransportProtocol
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+internal expect val needsGoogleBug346086163Workaround: Boolean
+
 @Composable
 fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
                          selectedMidiDeviceIndex: Int,
@@ -50,8 +52,9 @@ fun KtMidiDeviceSelector(modifier: Modifier = Modifier,
                     listExpanded = false
                 })
             }
-            // FIXME: remove it once Google fixed this DropdownMenu bug: https://issuetracker.google.com/issues/346086163
-            Text("An extra line to workaround Google bug 346086163", Modifier.height(50.dp))
+            if (needsGoogleBug346086163Workaround)
+                // FIXME: remove it once Google fixed this DropdownMenu bug: https://issuetracker.google.com/issues/346086163
+                Text("An extra line to workaround Google bug 346086163", Modifier.height(50.dp))
         }
     }
 }
