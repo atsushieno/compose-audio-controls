@@ -44,7 +44,7 @@ kotlin {
         iosSimulatorArm64()
     ).onEach {
         it.binaries {
-            framework { baseName = "ktmidi" }
+            framework { baseName = "ComposeAudioControls" }
         }
     }
 
