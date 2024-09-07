@@ -266,10 +266,10 @@ fun DiatonicKeyboard(noteOnStates: List<Long> = List(128) { 0L },
                             } else {
                                 val note = pointerIdToNote[it.id] ?: return@forEach
                                 val deltaMaxDp = expressionDragSensitivity.toFloat() // calculate only once
-                                val deltaX = (it.position.x - pointerIdToInitialOffset[it.id]!!.x).toDp().value
+                                val deltaX = (it.position.x - (pointerIdToInitialOffset[it.id]?.x ?: 0f)).toDp().value
                                 val dataX = min(deltaMaxDp, max(-deltaMaxDp, deltaX)) / deltaMaxDp
                                 onExpression(DiatonicKeyboardNoteExpressionOrigin.HorizontalDragging, note, dataX)
-                                val deltaY = (it.position.y - pointerIdToInitialOffset[it.id]!!.y).toDp().value
+                                val deltaY = (it.position.y - (pointerIdToInitialOffset[it.id]?.y ?: 0f)).toDp().value
                                 val dataY = min(deltaMaxDp, max(-deltaMaxDp, deltaY)) / deltaMaxDp
                                 onExpression(DiatonicKeyboardNoteExpressionOrigin.VerticalDragging, note, dataY)
                                 val originalPressure = pointerIdToPressure[it.id]
