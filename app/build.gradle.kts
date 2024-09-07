@@ -60,6 +60,7 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.ktmidi.jvm.desktop)
+            api(libs.libremidi.javacpp.platform)
         }
 
         val iosMain by creating { dependsOn(commonMain.get()) }
