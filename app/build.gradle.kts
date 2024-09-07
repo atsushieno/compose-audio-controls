@@ -7,6 +7,9 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsComposePlugin)
 }
+dependencies {
+    implementation(libs.monitor)
+}
 
 dependencies.platform(libs.compose.bom)
 
@@ -111,7 +114,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "dev.atsushieno.ktmidi.citool"
+            packageName = "org.androidaudioplugin.composeaudiocontrols.demoapp"
             packageVersion = "1.0.0"
         }
     }

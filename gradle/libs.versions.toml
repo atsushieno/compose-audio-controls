@@ -17,6 +17,7 @@ kotlinx-datetime = "0.6.0"
 gradle-javacpp = "1.5.10"
 binary-compatibility-validator = "0.14.0"
 libremidi-javacpp = "0.1.2"
+monitor = "1.7.2"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -30,6 +31,7 @@ ktmidi = { group = "dev.atsushieno", name = "ktmidi", version.ref = "ktmidi_vers
 ktmidi-jvm-desktop = { group = "dev.atsushieno", name = "ktmidi-jvm-desktop", version.ref = "ktmidi_version" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 libremidi-javacpp-platform = { module = "dev.atsushieno:libremidi-javacpp-platform", version.ref = "libremidi-javacpp" }
+monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
