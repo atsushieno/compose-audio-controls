@@ -4,19 +4,18 @@ agp = "8.2.2"
 android-compileSdk = "35"
 android-minSdk = "23"
 android-targetSdk = "35"
-kotlin = "2.0.20"
-core-ktx = "1.13.1"
+kotlin = "2.0.21"
+core-ktx = "1.15.0"
 junit = "4.13.2"
-kotlinx-coroutines-core = "1.9.0-RC"
-activity-compose = "1.9.2"
-compose-bom = "2024.09.00"
-dokka = "1.9.20"
-ktmidi_version = "0.10.0"
+kotlinx-coroutines-core = "1.9.0"
+activity-compose = "1.10.1"
+compose-bom = "2025.03.01"
+dokka = "2.0.0"
+ktmidi_version = "0.11.0"
 compose-plugin = "1.6.11"
 kotlinx-datetime = "0.6.0"
 gradle-javacpp = "1.5.10"
-binary-compatibility-validator = "0.14.0"
-libremidi-javacpp = "0.1.2"
+binary-compatibility-validator = "0.17.0"
 monitor = "1.7.2"
 
 [libraries]
@@ -30,7 +29,6 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ktmidi = { group = "dev.atsushieno", name = "ktmidi", version.ref = "ktmidi_version" }
 ktmidi-jvm-desktop = { group = "dev.atsushieno", name = "ktmidi-jvm-desktop", version.ref = "ktmidi_version" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
-libremidi-javacpp-platform = { module = "dev.atsushieno:libremidi-javacpp-platform", version.ref = "libremidi-javacpp" }
 monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 
 [plugins]
@@ -41,6 +39,5 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 dokkaPlugin = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 binaryCompatibilityValidatorPlugin = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
 jetbrainsComposePlugin = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
-gradleJavacppPlatform = { id = "org.bytedeco.gradle-javacpp-platform", version.ref = "gradle-javacpp" }
 
 [bundles]

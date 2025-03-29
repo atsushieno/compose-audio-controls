@@ -3,7 +3,6 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.gradleJavacppPlatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsComposePlugin)
 }
@@ -14,6 +13,8 @@ dependencies {
 dependencies.platform(libs.compose.bom)
 
 kotlin {
+    jvmToolchain(22)
+
     wasmJs {
         browser {
             commonWebpackConfig {
@@ -24,7 +25,7 @@ kotlin {
         binaries.executable()
     }
 
-    androidTarget {
+    androidTarget("android") {
         compilations.all {
             kotlinOptions {
                 jvmTarget = "1.8"
@@ -63,7 +64,6 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.ktmidi.jvm.desktop)
-            api(libs.libremidi.javacpp.platform)
         }
 
         val iosMain by creating { dependsOn(commonMain.get()) }
