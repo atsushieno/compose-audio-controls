@@ -50,7 +50,7 @@ jobs:
 
     - name: upload build failure logs
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-failure-logs
         path: |
@@ -60,7 +60,7 @@ jobs:
           compose-audio-controls-midi/*.log
     - name: upload artifact
       if: success()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: library-artifacts
         path: |
