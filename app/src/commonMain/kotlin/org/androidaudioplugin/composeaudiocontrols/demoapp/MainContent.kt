@@ -51,7 +51,7 @@ fun MainContent() {
 @Composable
 fun DiatonicMidiKeyboardDemo() {
     val scope by remember { mutableStateOf(KtMidiDeviceAccessScope(midiAccess)) }
-    SectionLabel("DiagnosticKeyboard Demo")
+    SectionLabel("DiatonicKeyboard Demo")
     scope.MidiDeviceConfigurator()
     scope.DiatonicLiveMidiKeyboard()
 }
