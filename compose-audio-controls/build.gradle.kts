@@ -111,8 +111,16 @@ android {
     }
 }
 
+val gitProjectName = "compose-audio-controls"
 val packageName = project.name
 val packageDescription = "Collection of Audio Controls for Jetpack Compose and Compose for Multiplatform"
+// my common settings
+val packageUrl = "https://github.com/atsushieno/$gitProjectName"
+val licenseName = "MIT"
+val licenseUrl = "https://github.com/atsushieno/$gitProjectName/blob/main/LICENSE"
+val devId = "atsushieno"
+val devName = "Atsushi Eno"
+val devEmail = "atsushieno@gmail.com"
 
 // Common copy-pasted
 mavenPublishing {
@@ -120,26 +128,12 @@ mavenPublishing {
     if (project.hasProperty("mavenCentralUsername") || System.getenv("ORG_GRADLE_PROJECT_mavenCentralUsername") != null)
         signAllPublications()
     coordinates(group.toString(), project.name, version.toString())
-
     pom {
         name.set(packageName)
         description.set(packageDescription)
-        url.set("https://github.com/atsushieno/compose-audio-controls")
-        scm {
-            url.set("https://github.com/atsushieno/compose-audio-controls")
-        }
-        licenses {
-            license {
-                name.set("the MIT License")
-                url.set("https://github.com/atsushieno/compose-audio-controls/blob/main/LICENSE")
-            }
-        }
-        developers {
-            developer {
-                id.set("atsushieno")
-                name.set("Atsushi Eno")
-                email.set("atsushieno@gmail.com")
-            }
-        }
+        url.set(packageUrl)
+        scm { url.set(packageUrl) }
+        licenses { license { name.set(licenseName); url.set(licenseUrl) } }
+        developers { developer { id.set(devId); name.set(devName); email.set(devEmail) } }
     }
 }
