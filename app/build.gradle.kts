@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -15,6 +16,7 @@ dependencies.platform(libs.compose.bom)
 kotlin {
     jvmToolchain(22)
 
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser {
             commonWebpackConfig {
@@ -36,7 +38,6 @@ kotlin {
     jvm("desktop")
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -67,7 +68,6 @@ kotlin {
         }
 
         val iosMain by creating { dependsOn(commonMain.get()) }
-        val iosX64Main by getting { dependsOn(iosMain) }
         val iosArm64Main by getting { dependsOn(iosMain) }
         val iosSimulatorArm64Main by getting { dependsOn(iosMain)
         }
@@ -118,8 +118,4 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
-}
-
-compose.experimental {
-    web.application {}
 }

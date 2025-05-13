@@ -17,6 +17,7 @@ kotlinx-datetime = "0.6.0"
 gradle-javacpp = "1.5.10"
 binary-compatibility-validator = "0.17.0"
 monitor = "1.7.2"
+vanniktech-maven-publish = "0.31.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -39,5 +40,6 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 dokkaPlugin = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 binaryCompatibilityValidatorPlugin = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
 jetbrainsComposePlugin = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-maven-publish" }
 
 [bundles]

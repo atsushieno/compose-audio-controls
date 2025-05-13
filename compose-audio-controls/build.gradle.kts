@@ -1,3 +1,6 @@
+import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 buildscript {
     repositories {
         maven("https://plugins.gradle.org/m2/")
@@ -15,6 +18,7 @@ plugins {
     alias(libs.plugins.binaryCompatibilityValidatorPlugin)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsComposePlugin)
+    alias(libs.plugins.vanniktech.maven.publish)
 }
 
 group = "org.androidaudioplugin"
@@ -35,12 +39,12 @@ kotlin {
         publishLibraryVariantsGroupedByFlavor = true
         publishLibraryVariants("debug", "release")
     }
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser {}
     }
     listOf(
         iosArm64(),
-        iosX64(),
         iosSimulatorArm64()
     ).onEach {
         it.binaries {
@@ -107,54 +111,31 @@ android {
     }
 }
 
-afterEvaluate {
-    val javadocJar by tasks.registering(Jar::class) {
-        archiveClassifier.set("javadoc")
-    }
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    if (project.hasProperty("mavenCentralUsername") || System.getenv("ORG_GRADLE_PROJECT_mavenCentralUsername") != null)
+        signAllPublications()
+    coordinates(group.toString(), project.name, version.toString())
 
-    publishing {
-        publications.withType<MavenPublication> {
-            artifact(javadocJar)
-            pom {
-                name.set("compose-audio-controls")
-                description.set("Collection of Audio Controls (WIP) for Jetpack Compose and Compose for Multiplatform")
-                url.set("https://github.com/atsushieno/compose-audio-controls")
-                scm {
-                    url.set("https://github.com/atsushieno/compose-audio-controls")
-                }
-                licenses {
-                    license {
-                        name.set("the MIT License")
-                        url.set("https://github.com/atsushieno/compose-audio-controls/blob/main/LICENSE")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("atsushieno")
-                        name.set("Atsushi Eno")
-                        email.set("atsushieno@gmail.com")
-                    }
-                }
+    pom {
+        name.set("compose-audio-controls")
+        description.set("Collection of Audio Controls (WIP) for Jetpack Compose and Compose for Multiplatform")
+        url.set("https://github.com/atsushieno/compose-audio-controls")
+        scm {
+            url.set("https://github.com/atsushieno/compose-audio-controls")
+        }
+        licenses {
+            license {
+                name.set("the MIT License")
+                url.set("https://github.com/atsushieno/compose-audio-controls/blob/main/LICENSE")
             }
         }
-
-        repositories {
-            maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = System.getenv("OSSRH_USERNAME")
-                    password = System.getenv("OSSRH_PASSWORD")
-                }
+        developers {
+            developer {
+                id.set("atsushieno")
+                name.set("Atsushi Eno")
+                email.set("atsushieno@gmail.com")
             }
         }
     }
-
-    // keep it as is. It is replaced by CI release builds
-    signing {}
-}
-
-// https://kotlinlang.slack.com/archives/C0F4UNJET/p1685393101873549?thread_ts=1685392725.401269&cid=C0F4UNJET
-tasks.withType<AbstractPublishToMaven>().configureEach {
-    dependsOn(tasks.withType<Sign>())
 }

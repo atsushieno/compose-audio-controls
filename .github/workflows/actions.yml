@@ -19,34 +19,18 @@ jobs:
         distribution: temurin
         java-version: 22
 
-    # Only for release tags
-    - name: setup gpg necessities
-      if: startsWith(github.ref, 'refs/tags/')
-      run: sudo bash -c "echo '$GPG_KEY_CONTENTS' | base64 -d > $WORKSPACE/'$SIGNING_SECRET_KEY_RING_FILE'"
-      env:
-        WORKSPACE: ${{ github.workspace }}
-        GPG_KEY_CONTENTS: ${{ secrets.GPG_KEY_CONTENTS }}
-        SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
-    - name: rewrite build.gradle.kts to require signing
-      if: startsWith(github.ref, 'refs/tags/')
-      run: |
-        sed -i "" "s/signing {}/signing { sign(publishing.publications) }/" compose-audio-controls/build.gradle.kts
-        sed -i "" "s/signing {}/signing { sign(publishing.publications) }/" compose-audio-controls-midi/build.gradle.kts
-
     # build or publish, depending on whether it is for release tags or not
     - name: build (ONLY FOR NON-RELEASES)
       if: ${{ !startsWith(github.ref, 'refs/tags/') }}
       run: ./gradlew --warning-mode all build
     - name: publish (ONLY FOR NEW RELEASE TAGS)
       if: startsWith(github.ref, 'refs/tags/')
-      run: ./gradlew --warning-mode all publish dokkaHtml
+      run: ./gradlew --warning-mode all publishToMavenCentral dokkaHtml
       env:
-        GITHUB_TOKEN: ${{ secrets.MAVEN_PAT }}
-        OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-        OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-        SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-        SIGNING_SECRET_KEY_RING_FILE: ${{ format('{0}/{1}', github.workspace, secrets.SIGNING_SECRET_KEY_RING_FILE) }}
+        ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+        ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+        ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
 
     - name: upload build failure logs
       if: failure()
