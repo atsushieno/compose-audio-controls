@@ -112,6 +112,10 @@ android {
     }
 }
 
+val packageName = project.name
+val packageDescription = "Collection of Audio Controls for Jetpack Compose and Compose for Multiplatform - MIDI support extensibility"
+
+// Common copy-pasted
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     if (project.hasProperty("mavenCentralUsername") || System.getenv("ORG_GRADLE_PROJECT_mavenCentralUsername") != null)
@@ -119,8 +123,8 @@ mavenPublishing {
     coordinates(group.toString(), project.name, version.toString())
 
     pom {
-        name.set("compose-audio-controls-midi")
-        description.set("Collection of Audio Controls (WIP) for Jetpack Compose and Compose for Multiplatform - MIDI support extensibility")
+        name.set(packageName)
+        description.set(packageDescription)
         url.set("https://github.com/atsushieno/compose-audio-controls")
         scm {
             url.set("https://github.com/atsushieno/compose-audio-controls")
