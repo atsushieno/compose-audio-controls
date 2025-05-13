@@ -1,5 +1,5 @@
 [versions]
-compose-audio-controls = "0.7.0" # ourselves
+compose-audio-controls = "0.7.1" # ourselves
 agp = "8.7.3"
 android-compileSdk = "36"
 android-minSdk = "23"
