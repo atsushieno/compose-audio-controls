@@ -1,8 +1,7 @@
 public final class org/androidaudioplugin/composeaudiocontrols/midi/ComposableSingletons$MidiDeviceConfiguratorKt {
 	public static final field INSTANCE Lorg/androidaudioplugin/composeaudiocontrols/midi/ComposableSingletons$MidiDeviceConfiguratorKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function2;
 	public fun <init> ()V
-	public final fun getLambda-1$compose_audio_controls_midi_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$2015677764$compose_audio_controls_midi_release ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class org/androidaudioplugin/composeaudiocontrols/midi/ControlSettings {
@@ -71,7 +70,7 @@ public abstract interface class org/androidaudioplugin/composeaudiocontrols/midi
 	public abstract fun getMidi2Machine ()Ldev/atsushieno/ktmidi/Midi2Machine;
 	public abstract fun getOutputs ()Ljava/util/List;
 	public abstract fun getSend ()Lkotlin/jvm/functions/Function4;
-	public abstract fun getUseMidi2Protocol ()Z
+	public fun getUseMidi2Protocol ()Z
 	public abstract fun isTransportUmp ()Z
 	public abstract fun onMidiProtocolChange (Z)V
 	public abstract fun onSelectionChange (I)V
