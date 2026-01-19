@@ -5,7 +5,6 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import dev.atsushieno.ktmidi.JvmMidiAccess
 import dev.atsushieno.ktmidi.LibreMidiAccess
-import dev.atsushieno.ktmidi.MergedMidiAccess
 import dev.atsushieno.ktmidi.MidiTransportProtocol
 import org.androidaudioplugin.composeaudiocontrols.demoapp.MainContent
 import org.androidaudioplugin.composeaudiocontrols.demoapp.midiAccess

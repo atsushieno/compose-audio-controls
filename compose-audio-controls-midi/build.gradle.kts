@@ -1,6 +1,8 @@
-import com.vanniktech.maven.publish.SonatypeHost
-import org.jetbrains.compose.compose
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 buildscript {
     repositories {
@@ -29,9 +31,7 @@ kotlin {
     jvmToolchain(17)
 
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
-        }
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
         testRuns["test"].executionTask.configure {
             useJUnit()
         }
@@ -56,10 +56,11 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material3)
-                api(compose.ui)
+                implementation(libs.runtime)
+                implementation(libs.foundation)
+                implementation(libs.material3)
+                implementation(libs.ui)
+                implementation(libs.material.symbols.outlined.filled.cmp)
 
                 implementation(libs.ktmidi)
                 implementation(project(":compose-audio-controls"))
@@ -125,7 +126,7 @@ val devEmail = "atsushieno@gmail.com"
 
 // Common copy-pasted
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
     if (project.hasProperty("mavenCentralUsername") || System.getenv("ORG_GRADLE_PROJECT_mavenCentralUsername") != null)
         signAllPublications()
     coordinates(group.toString(), project.name, version.toString())

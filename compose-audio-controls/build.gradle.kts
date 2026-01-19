@@ -1,5 +1,8 @@
-import com.vanniktech.maven.publish.SonatypeHost
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 buildscript {
     repositories {
@@ -28,9 +31,7 @@ kotlin {
     jvmToolchain(17)
 
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
-        }
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
         testRuns["test"].executionTask.configure {
             useJUnit()
         }
@@ -124,7 +125,7 @@ val devEmail = "atsushieno@gmail.com"
 
 // Common copy-pasted
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
     if (project.hasProperty("mavenCentralUsername") || System.getenv("ORG_GRADLE_PROJECT_mavenCentralUsername") != null)
         signAllPublications()
     coordinates(group.toString(), project.name, version.toString())

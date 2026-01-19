@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -28,6 +25,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlinedfilled.Block
+import com.composables.icons.materialsymbols.outlinedfilled.Circle
+import com.composables.icons.materialsymbols.outlinedfilled.Disabled_visible
 import dev.atsushieno.ktmidi.MidiCC
 import dev.atsushieno.ktmidi.MidiChannelStatus
 import dev.atsushieno.ktmidi.Ump
@@ -423,7 +424,7 @@ fun MidiDeviceAccessScope.MidiKnobControllerCombo(knobBitmap: ImageBitmap) {
         }
 
         Column(Modifier.align(Alignment.CenterVertically).padding(knobPadding, 8.dp)) {
-            Image(imageVector = if (discrete) Icons.Default.CheckCircle else Icons.Default.Close,
+            Image(imageVector = if (discrete) MaterialSymbols.OutlinedFilled.Circle else MaterialSymbols.OutlinedFilled.Block,
                 "send", Modifier.size(32.dp).background(Color.White).clickable {
                     discrete = !discrete
                     updateValueState(true, controlTarget, control1.toInt(), control2.toInt(), control3.toInt())

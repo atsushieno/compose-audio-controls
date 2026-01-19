@@ -1,5 +1,6 @@
 package org.androidaudioplugin.composeaudiocontrols.demoapp
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -12,9 +13,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageBitmapConfig
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import composeaudiocontrols.app.generated.resources.*
@@ -31,10 +40,14 @@ import org.androidaudioplugin.composeaudiocontrols.defaultKnobMinSizeInDp
 import org.androidaudioplugin.composeaudiocontrols.midi.DiatonicLiveMidiKeyboard
 import org.androidaudioplugin.composeaudiocontrols.midi.KtMidiDeviceAccessScope
 import org.androidaudioplugin.composeaudiocontrols.midi.MidiDeviceConfigurator
+import org.androidaudioplugin.composeaudiocontrols.midi.MidiKnobControllerCombo
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.imageResource
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.math.sin
 
 internal fun formatLabelNumber(v: Float, charsInPositiveNumber: Int = 5) = v.toDouble().toString().take(charsInPositiveNumber + if (v < 0) 1 else 0)
 
@@ -54,6 +67,57 @@ fun DiatonicMidiKeyboardDemo() {
     SectionLabel("DiatonicKeyboard Demo")
     scope.MidiDeviceConfigurator()
     scope.DiatonicLiveMidiKeyboard()
+    scope.MidiKnobControllerCombo(generateVerticalSpriteSheet(64, 64))
+}
+
+private fun generateVerticalSpriteSheet(size: Int = 64, frames: Int = 64): ImageBitmap {
+    val totalHeight = size * frames
+
+    val bitmap = ImageBitmap(size, totalHeight, ImageBitmapConfig.Argb8888)
+    val canvas = Canvas(bitmap)
+
+    val drawScope = CanvasDrawScope()
+
+    drawScope.draw(
+        density = Density(1f),
+        layoutDirection = LayoutDirection.Ltr,
+        canvas = canvas,
+        size = androidx.compose.ui.geometry.Size(size.toFloat(), totalHeight.toFloat())
+    ) {
+        // Clear background (optional, depends if you want transparency)
+        drawRect(color = Color.Transparent, blendMode = BlendMode.Clear)
+
+        for (i in 0 until frames) {
+            // Calculate the angle for this frame
+            // Range: 240 (Bottom-Left) to -60 (Bottom-Right)
+            val angleDeg = 240f + (i.toFloat() / (frames - 1)) * (-60f - 240f)
+            val angleRad = angleDeg * (PI.toFloat() / 180f)
+
+            // Center of the current 64x64 box
+            val centerY = (i * size) + (size / 2f)
+            val centerX = size / 2f
+            val center = Offset(centerX, centerY)
+
+            // Calculate end point of the line (radius = 24 pixels)
+            val radius = 24f
+            val endOffset = Offset(
+                x = centerX + radius * cos(angleRad),
+                // Subtract sin because Y-axis increases downwards in Compose
+                y = centerY - radius * sin(angleRad)
+            )
+
+            // Draw the angled line
+            drawLine(
+                color = Color.Gray, // Or your preferred color
+                start = center,
+                end = endOffset,
+                strokeWidth = 3f,
+                cap = StrokeCap.Round
+            )
+        }
+    }
+
+    return bitmap
 }
 
 @Composable

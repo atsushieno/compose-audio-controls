@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import kotlinx.datetime.Clock
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -152,7 +151,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
         val draggableState = rememberDraggableState(onDelta = {
             val deltaInDp = it.toDp()
 
-            val now = Clock.System.now().toEpochMilliseconds()
+            val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
             inFineHoldMode = inFineHoldMode || now - lastDragActionTimeInMillis > fineModeDelayMs
             lastDragActionTimeInMillis = now
 
@@ -190,7 +189,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
                         awaitPointerEventScope {
                             while (true) {
                                 awaitFirstDown()
-                                lastDragActionTimeInMillis = Clock.System.now().toEpochMilliseconds()
+                                lastDragActionTimeInMillis = kotlin.time.Clock.System.now().toEpochMilliseconds()
                             }
                         }
                     }
