@@ -66,7 +66,7 @@ fun DiatonicMidiKeyboardDemo() {
     val scope by remember { mutableStateOf(KtMidiDeviceAccessScope(midiAccess)) }
     SectionLabel("DiatonicKeyboard Demo")
     scope.MidiDeviceConfigurator()
-    scope.DiatonicLiveMidiKeyboard()
+    scope.DiatonicLiveMidiKeyboard(numWhiteKeys = 21)
     scope.MidiKnobControllerCombo(generateVerticalSpriteSheet(64, 64))
 }
 

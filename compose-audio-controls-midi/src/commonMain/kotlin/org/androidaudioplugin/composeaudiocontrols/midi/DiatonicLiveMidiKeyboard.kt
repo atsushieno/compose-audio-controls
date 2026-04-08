@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Modifier
 import dev.atsushieno.ktmidi.MidiChannelStatus
 import dev.atsushieno.ktmidi.Ump
 import dev.atsushieno.ktmidi.UmpFactory
@@ -16,9 +17,18 @@ import org.androidaudioplugin.composeaudiocontrols.DiatonicKeyboardWithControlle
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+@Composable
+fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() = this.DiatonicLiveMidiKeyboard(
+    Modifier,
+    initialOctaveZeroBased = 4,
+    numWhiteKeys = 14
+)
 
 @Composable
-fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
+fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard(
+    modifier: Modifier = Modifier,
+    initialOctaveZeroBased: Int = 4,
+    numWhiteKeys: Int = 14) {
     Column {
         val noteOnStates = remember { List(128) { 0L }.toMutableStateList() }
         var expressionX by remember { mutableStateOf(0f) }
@@ -27,6 +37,7 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
 
         DiatonicKeyboardWithControllers(
             noteOnStates.toList(),
+            modifier,
             showExpressionSensitivitySlider = false,
             onNoteOn = { note, _ ->
                 if (isTransportUmp) {
@@ -92,7 +103,9 @@ fun MidiDeviceAccessScope.DiatonicLiveMidiKeyboard() {
                     DiatonicKeyboardNoteExpressionOrigin.Pressure -> expressionP = data
                     else -> {}
                 }
-            }
+            },
+            initialOctaveZeroBased = initialOctaveZeroBased,
+            numWhiteKeys = numWhiteKeys
         )
     }
 }
