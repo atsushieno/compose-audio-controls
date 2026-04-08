@@ -45,6 +45,7 @@ public final class org/androidaudioplugin/composeaudiocontrols/midi/ControlTarge
 
 public final class org/androidaudioplugin/composeaudiocontrols/midi/DiatonicLiveMidiKeyboardKt {
 	public static final fun DiatonicLiveMidiKeyboard (Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope;Landroidx/compose/runtime/Composer;I)V
+	public static final fun DiatonicLiveMidiKeyboard (Lorg/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope;Landroidx/compose/ui/Modifier;IILandroidx/compose/runtime/Composer;II)V
 }
 
 public final class org/androidaudioplugin/composeaudiocontrols/midi/KtMidiDeviceAccessScope : org/androidaudioplugin/composeaudiocontrols/midi/MidiDeviceAccessScope {
