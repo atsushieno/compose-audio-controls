@@ -147,6 +147,14 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
     with(LocalDensity.current) {
         var isBeingDragged by remember { mutableStateOf(false) }
         val sizePx = explicitSizeInDp?.toPx() ?: if (minSizeInDp.toPx() > knobSrcSizePx) minSizeInDp.toPx() else knobSrcSizePx.toFloat()
+        val painter = remember(imageBitmap, knobSrcSizePx, sizePx, imageIndex) {
+            ScalingPainter(
+                imageBitmap,
+                srcSize = IntSize(knobSrcSizePx, knobSrcSizePx),
+                srcOffset = IntOffset(0, knobSrcSizePx * imageIndex),
+                scale = sizePx / knobSrcSizePx
+            )
+        }
 
         val draggableState = rememberDraggableState(onDelta = {
             val deltaInDp = it.toDp()
@@ -168,12 +176,7 @@ fun ImageStripKnob(modifier: Modifier = Modifier,
 
         Column {
             Image(
-                ScalingPainter(
-                    imageBitmap,
-                    srcSize = IntSize(knobSrcSizePx, knobSrcSizePx),
-                    srcOffset = IntOffset(0, knobSrcSizePx * imageIndex),
-                    scale = sizePx / knobSrcSizePx
-                ),
+                painter,
                 contentDescription = "knob image",
                 contentScale = ContentScale.Inside,
                 alignment = Alignment.TopStart,
